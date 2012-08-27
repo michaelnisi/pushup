@@ -6,6 +6,7 @@ var EventEmitter = require('events').EventEmitter
   , source = '/tmp/repos'
   , target = '/tmp/deploy'
   , repos = pushover(source)
+  , validateProps = require('./lib/validateProps.js')
   , reader = require('./lib/reader.js')
   , fstream = require('fstream')
   , writer = fstream.Writer(target)
@@ -36,27 +37,7 @@ repos.on('push', function (repo, commit, branch) {
 function pushup (props) {
   var me = new EventEmitter()
 
-  if (!props) {
-    throw new Error('Props are required.')
-    return
-  }
-  
-  var actual = Object.keys(props)
-    , valid = false
-  
-  if (!actual.length) {
-    throw new Error('Required properties: port')
-  }
-
-  requiredProps.forEach(function (requiredKey) {
-    valid = actual.some(function (actualKey) {
-      return actualKey === requiredKey
-    })
-
-    if (!valid) {
-      throw new Error(requiredKey + ' is required.')
-    }
-  })
+  validateProps(props)  
 
   return me
 }
