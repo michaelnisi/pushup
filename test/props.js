@@ -27,3 +27,12 @@ test('empty', function (t) {
   t.throws(fn, new Error('Required properties: port'))
   t.end()
 })
+
+test('missing', function (t) {
+  var fn = function () {
+    push({ accessKeyId:'123' })
+  }
+  
+  t.throws(fn, new Error('port is required.'))
+  t.end()
+})

@@ -10,6 +10,15 @@ var EventEmitter = require('events').EventEmitter
   , fstream = require('fstream')
   , writer = fstream.Writer(target)
 
+var requiredProps = [ 
+    'port'
+  , 'accessKeyId'
+  , 'secretAccessKey'
+  , 'bucket'
+  , 'region'
+  , 'baseDir'
+]
+
 repos.on('push', function (repo, commit, branch) {
   console.log(
     'received a push to ' + repo + '/' + commit + ' (' + branch + ')'
@@ -32,21 +41,20 @@ function push (props) {
     return
   }
   
-  var required = ['port']
-    , actual = Object.keys(props)
+  var actual = Object.keys(props)
     , valid = false
   
   if (!actual.length) {
     throw new Error('Required properties: port')
   }
 
-  required.forEach(function (requiredKey) {
-    valid = actual.some(requiredKey, function (actualKey) {
+  requiredProps.forEach(function (requiredKey) {
+    valid = actual.some(function (actualKey) {
       return actualKey === requiredKey
     })
 
     if (!valid) {
-      throw new Error(requiredKey + 'is required.')
+      throw new Error(requiredKey + ' is required.')
     }
   })
 
