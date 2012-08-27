@@ -1,4 +1,4 @@
-module.exports = push
+module.exports = pushup
 
 var EventEmitter = require('events').EventEmitter
   , join = require('path').join
@@ -33,7 +33,7 @@ repos.on('push', function (repo, commit, branch) {
   reader.pipe(writer)
 })
 
-function push (props) {
+function pushup (props) {
   var me = new EventEmitter()
 
   if (!props) {
