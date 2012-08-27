@@ -6,7 +6,7 @@ test('undefined', function (t) {
     push()
   }
   
-  t.throws(fn, new Error('Props are required.'))
+  t.throws(fn, new Error('props required'))
   t.end()
 })
 
@@ -15,7 +15,7 @@ test('null', function (t) {
     push(null)
   }
   
-  t.throws(fn, new Error('Props are required.'))
+  t.throws(fn, new Error('props required'))
   t.end()
 })
 
@@ -24,7 +24,7 @@ test('empty', function (t) {
     push({})
   }
   
-  t.throws(fn, new Error('Required properties: port'))
+  t.throws(fn, new Error('props required'))
   t.end()
 })
 
@@ -33,6 +33,6 @@ test('missing', function (t) {
     push({ accessKeyId:'123' })
   }
   
-  t.throws(fn, new Error('port is required.'))
+  t.throws(fn, new Error('props.port required'))
   t.end()
 })
