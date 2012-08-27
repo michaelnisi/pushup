@@ -1,4 +1,1 @@
-push-to-s3
-==========
-
-Push to S3
+# pushup - upload to S3 by pushing to a git repo
