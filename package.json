@@ -1,25 +1,18 @@
 {
-  "name": "s3-pusher",
+  "name": "pushup",
   "version": "0.0.0",
-  "description": "Push to S3",
   "main": "index.js",
   "directories": {
     "example": "example",
     "test": "test"
   },
   "scripts": {
-    "test": "tap --stderr test/*"
+    "test": "tap test/*"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/michaelnisi/s3-pusher.git"
+    "url": "git://github.com/michaelnisi/pushup.git"
   },
-  "keywords": [
-    "git",
-    "push",
-    "deploy",
-    "s3"
-  ],
   "author": "Michael Nisi",
   "license": "MIT"
 }
