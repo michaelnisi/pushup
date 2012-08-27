@@ -1,10 +1,12 @@
+module.exports = push
 
-var join = require('path').join
+var EventEmitter = require('events').EventEmitter
+  , join = require('path').join
   , pushover = require('pushover')
   , source = '/tmp/repos'
   , target = '/tmp/deploy'
-  , repos = pushover(dir)
-  , reader = require('./reader.js')
+  , repos = pushover(source)
+  , reader = require('./lib/reader.js')
   , fstream = require('fstream')
   , writer = fstream.Writer(target)
 
@@ -22,4 +24,31 @@ repos.on('push', function (repo, commit, branch) {
   reader.pipe(writer)
 })
 
-repos.listen(7000)
+function push (props) {
+  var me = new EventEmitter()
+
+  if (!props) {
+    throw new Error('Props are required.')
+    return
+  }
+  
+  var required = ['port']
+    , actual = Object.keys(props)
+    , valid = false
+  
+  if (!actual.length) {
+    throw new Error('Required properties: port')
+  }
+
+  required.forEach(function (requiredKey) {
+    valid = actual.some(requiredKey, function (actualKey) {
+      return actualKey === requiredKey
+    })
+
+    if (!valid) {
+      throw new Error(requiredKey + 'is required.')
+    }
+  })
+
+  return me
+}
