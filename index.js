@@ -7,18 +7,8 @@ var EventEmitter = require('events').EventEmitter
   , target = '/tmp/deploy'
   , repos = pushover(source)
   , validateProps = require('./lib/validateProps.js')
-  , reader = require('./lib/reader.js')
+  , stat = require('./lib/reader.js')
   , fstream = require('fstream')
-  , writer = fstream.Writer(target)
-
-var requiredProps = [ 
-    'port'
-  , 'accessKeyId'
-  , 'secretAccessKey'
-  , 'bucket'
-  , 'region'
-  , 'baseDir'
-]
 
 repos.on('push', function (repo, commit, branch) {
   console.log(
@@ -26,12 +16,10 @@ repos.on('push', function (repo, commit, branch) {
   )
   
   var dir = join(source, repo)
-
-  reader(dir).on('item', function (item) {
-    console.log(item)
-  })
-
-  reader.pipe(writer)
+    , reader = fstream.Reader(dir)
+    , writer = fstream.Writer(target)
+  
+  stat(dir).pipe(reader).pipe(writer)
 })
 
 function pushup (props) {

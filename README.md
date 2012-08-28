@@ -1,1 +1,1 @@
-# pushup - upload to S3
+# pushup - push tp S3
