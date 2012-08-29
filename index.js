@@ -12,6 +12,7 @@ function pushup (props) {
   var stream = new Stream()
     , client = knox.createClient(props)
     , files = show(props.repo)
+    , commit
   
   process.chdir(props.repo)
 
@@ -22,29 +23,29 @@ function pushup (props) {
     stream.emit('end')
   }
 
-  stream.write = function (file) {
-    stat(file, function (err, stats) {
-     if (err || !stats.isFile()) {
-        return true // just skip it
-      }
-    
-      var entry = client.putFile(file, '/' + file, function (err, res) {
-        if (err) {
-          stream.emit('error', err)
-          return
-        }
-
-        stream.emit('response', res)
-        stream.emit('resume')
-      })
-      
-      entry.name = file
-
-      stream.emit('pause')
-      stream.emit('entry', entry)
-      
+  stream.write = function (data) {
+    if (!commit) {
+      commit = data.split(' ').shift()
+      stream.emit('commit', commit)
       return true
+    }
+
+    var entry = client.putFile(data, '/' + data, function (err, res) {
+      if (err) {
+        stream.emit('error', err)
+        return
+      }
+
+      stream.emit('response', res)
+      stream.emit('resume')
     })
+    
+    entry.name = data
+
+    stream.emit('pause')
+    stream.emit('entry', entry)
+    
+    return true
   }
 
   return files.pipe(stream)

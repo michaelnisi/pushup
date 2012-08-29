@@ -18,3 +18,7 @@ p.on('response', function (res) {
     console.log('OK')
   })
 })
+
+p.on('commit', function (commit) {
+  console.log(commit)
+})
