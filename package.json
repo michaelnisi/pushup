@@ -1,6 +1,6 @@
 {
-  "name": "pushup",
-  "version": "0.0.0",
+  "name": "y",
+  "version": "0.0.1",
   "main": "index.js",
   "directories": {
     "example": "example",
@@ -14,5 +14,21 @@
     "url": "git://github.com/michaelnisi/pushup.git"
   },
   "author": "Michael Nisi",
-  "license": "MIT"
+  "license": "MIT",
+  "description": "Upload last commit to S3",
+  "keywords": [
+    "upload",
+    "commit",
+    "S3"
+  ],
+  "dependencies": {
+    "event-stream": ">=3.0.2",
+    "knox": ">=0.3.0" 
+  },
+  "devDependencies": {
+    "tap": ">=0.3.1"
+  },
+  "engines": {
+    "node": ">=0.8.0"
+  }
 }
