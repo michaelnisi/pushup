@@ -1,1 +1,1 @@
-# pushup - push tp S3
+# pushup - Upload last commit to S3
