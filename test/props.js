@@ -1,18 +1,19 @@
 var test = require('tap').test
-  , push = require('../index.js')
+  , validate = require('../lib/validateProps.js')
 
 test('undefined', function (t) {
   var fn = function () {
-    push()
+    validate()
   }
   
   t.throws(fn, new Error('props required'))
   t.end()
 })
 
+
 test('null', function (t) {
   var fn = function () {
-    push(null)
+    validate(null)
   }
   
   t.throws(fn, new Error('props required'))
@@ -21,7 +22,7 @@ test('null', function (t) {
 
 test('empty', function (t) {
   var fn = function () {
-    push({})
+    validate({})
   }
   
   t.throws(fn, new Error('props required'))
@@ -30,9 +31,9 @@ test('empty', function (t) {
 
 test('missing', function (t) {
   var fn = function () {
-    push({ accessKeyId:'123' })
+    validate({ key:'123' })
   }
   
-  t.throws(fn, new Error('props.port required'))
+  t.throws(fn, new Error('props.secret required'))
   t.end()
 })
