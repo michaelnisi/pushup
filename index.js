@@ -1,31 +1,51 @@
 module.exports = pushup
 
-var EventEmitter = require('events').EventEmitter
+var validateProps = require('./lib/validateProps.js')
+  , es = require('event-stream')
+  , knox = require('knox')
+  , Stream = require('stream').Stream
+  , show = require('./lib/show.js')
+  , stat = require('fs').stat
   , join = require('path').join
-  , pushover = require('pushover')
-  , source = '/tmp/repos'
-  , target = '/tmp/deploy'
-  , repos = pushover(source)
-  , validateProps = require('./lib/validateProps.js')
-  , stat = require('./lib/reader.js')
-  , fstream = require('fstream')
-
-repos.on('push', function (repo, commit, branch) {
-  console.log(
-    'received a push to ' + repo + '/' + commit + ' (' + branch + ')'
-  )
-  
-  var dir = join(source, repo)
-    , reader = fstream.Reader(dir)
-    , writer = fstream.Writer(target)
-  
-  stat(dir).pipe(reader).pipe(writer)
-})
 
 function pushup (props) {
-  var me = new EventEmitter()
+  var stream = new Stream()
+    , client = knox.createClient(props)
+    , files = show(props.repo)
+  
+  process.chdir(props.repo)
 
-  validateProps(props)  
+  stream.readable = true
+  stream.writable = true
 
-  return me
+  stream.end = function () {
+    stream.emit('end')
+  }
+
+  stream.write = function (file) {
+    stat(file, function (err, stats) {
+     if (err || !stats.isFile()) {
+        return true // just skip it
+      }
+    
+      var entry = client.putFile(file, '/' + file, function (err, res) {
+        if (err) {
+          stream.emit('error', err)
+          return
+        }
+
+        stream.emit('response', res)
+        stream.emit('resume')
+      })
+      
+      entry.name = file
+
+      stream.emit('pause')
+      stream.emit('entry', entry)
+      
+      return true
+    })
+  }
+
+  return files.pipe(stream)
 }
