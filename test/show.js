@@ -1,11 +1,10 @@
 var test = require('tap').test
   , fs = require('fs')
   , join = require('path').join
-, es = require('event-stream')
-, show = require('../lib/show.js')
-, dir = '/tmp/pushup-' + Math.floor(Math.random() * (1<<24))
-, seq = require('seq')
-, spawn = require('child_process').spawn
+  , es = require('event-stream')
+  , show = require('../lib/show.js')
+  , dir = '/tmp/pushup-' + Math.floor(Math.random() * (1<<24))
+  , spawn = require('child_process').spawn
 
 test('setup', function (t) {
   fs.mkdirSync(dir, 0700)
