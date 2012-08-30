@@ -17,6 +17,13 @@ test('empty', function (t) {
 })
 
 test('missing', function (t) {
-  t.same(validate({ key:'123' }), new Error('props.repo required'))
+  var props = {
+      key: 123
+    , secret: 'beep'
+    , bucket: 'boop'
+    , repo: null
+  }
+
+  t.same(validate(props), new Error('props.repo required'))
   t.end()
 })
