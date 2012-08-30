@@ -10,7 +10,6 @@ test('undefined', function (t) {
   t.end()
 })
 
-
 test('null', function (t) {
   var fn = function () {
     validate(null)
