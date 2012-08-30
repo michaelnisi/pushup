@@ -48,13 +48,13 @@ test('lines', function (t) {
   show(dir)
     .pipe(es.writeArray(function (err, lines) {
       t.equals(lines.length, 2)
+      t.equals(lines.pop(), 'hello.js')
       t.end()
     })
   )
 })
 
 test('teardown', function (t) {
-  // clean up, will ya?
   t.end()
 })
 

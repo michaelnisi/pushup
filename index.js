@@ -5,7 +5,6 @@ var validateProps = require('./lib/validateProps.js')
   , knox = require('knox')
   , Stream = require('stream').Stream
   , show = require('./lib/show.js')
-  , stat = require('fs').stat
   , join = require('path').join
 
 function pushup (props, callback) {
@@ -13,7 +12,7 @@ function pushup (props, callback) {
     , client = knox.createClient(props)
     , files = show(props.repo)
     , error = validateProps(props, stream)
-    , commit
+    , commit = null
 
   if (error) {
     if (callback) callback(error)
