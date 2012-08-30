@@ -3,6 +3,7 @@ var test = require('tap').test
   , show = require('../lib/show.js')
 
 test('lines', function (t) {
+  t.end()
   var dir = '/tmp/troubled-site'
   
   show(dir)
