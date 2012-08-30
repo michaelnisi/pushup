@@ -12,9 +12,14 @@ function pushup (props, callback) {
   var stream = new Stream()
     , client = knox.createClient(props)
     , files = show(props.repo)
+    , error = validateProps(props, stream)
     , commit
-    , error
-  
+
+  if (error) {
+    if (callback) callback(error)
+    return error
+  }
+
   process.chdir(props.repo)
 
   stream.readable = true

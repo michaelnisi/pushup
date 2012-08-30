@@ -1,7 +1,9 @@
 var pushup = require('../index.js')
   , getProps = require('../lib/getProps.js')
 
-var p = pushup(getProps())
+var p = pushup(getProps(), function (err, commit) {
+  err ? console.error(err) : console.log(commit)    
+})
 
 p.on('entry', function (entry) {
   entry.on('progress', function (prog) {
