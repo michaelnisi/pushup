@@ -4,7 +4,7 @@
 
 ## Description
 
-Pushup uploads the latest commit in a given branch of a Git repository to S3.
+Pushup uploads the latest commit in a given branch of a Git repository to [S3](http://aws.amazon.com/s3/).
 
 ## CLI Usage
 
