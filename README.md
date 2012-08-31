@@ -1,4 +1,4 @@
-# pushup - push last commit to S3
+# pushup - push latest commit to S3
 
 [![Build Status](https://secure.travis-ci.org/michaelnisi/pushup.png)](http://travis-ci.org/michaelnisi/pushup)
 
@@ -42,3 +42,17 @@ Upload latest commit to S3:
     pushup(props, function (err, commit) {
       console.log('%s uploaded', commit)
     })
+
+## INSTALLATION
+
+Install with [npm](http://npmjs.org/):
+
+    npm install pushup
+
+To use pushup from the command-line:
+    
+    npm install -g pushup
+
+## LICENSE
+
+[MIT License](https://raw.github.com/michaelnisi/pushup/master/LICENSE)
