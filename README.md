@@ -43,29 +43,25 @@ Upload latest commit to S3:
       console.log('%s uploaded', commit)
     })
 
-pushup returns a readable Stream.
-
-## Pushup Stream
-
-A `Readable Stream` has the following events
+`pushup` returns a readable `Stream` that emits following events:
 
 ### Event:'error'
 
     function (err) {}
 
-Emitted if there was an error receiving data.
+Emitted if there was an error.
 
 ### Event:'entry'
 
     function (entry) {}
 
-Emitted when an entry is added from the commit, and its upload begins.
+Emitted when an entry is added from the commit.
 
 ### Event:'commit'
 
     function (commit) {}
 
-Emitted when first line of the commit is written to the Stream.  
+Emitted when the first line of the commit is written to the Stream.  
 
 ### Event:'end'
 
