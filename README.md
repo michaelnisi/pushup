@@ -4,11 +4,11 @@
 
 ## Description
 
-Pushup uploads the latest commit of a git repository to S3.
+Pushup uploads the latest commit in a given branch of a Git repository to S3.
 
 ## CLI Usage
 
-Create a repository, and add a file:
+Create repo, and add a file:
 
     mkdir site
     cd site
