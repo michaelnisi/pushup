@@ -1,6 +1,6 @@
 {
   "name": "pushup",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "index.js",
   "directories": {
     "example": "example",
@@ -9,11 +9,18 @@
   "scripts": {
     "test": "tap test/*"
   },
+  "bin": {
+    "pushup": "./bin/cli.js"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/michaelnisi/pushup.git"
   },
-  "author": "Michael Nisi",
+  "author": {
+    "name": "Michael Nisi",
+    "email": "michael.nisi@gmail.com",
+    "url": "http://michaelnisi.com"
+  },
   "license": "MIT",
   "description": "Upload last commit to S3",
   "keywords": [
