@@ -43,7 +43,7 @@ function pushup (props, callback) {
         return true
       }
 
-      stream.emit('response', res)
+      stream.emit('data', res)
       stream.emit('resume')
     })
     

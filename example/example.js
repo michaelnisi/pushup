@@ -15,7 +15,7 @@ p.on('error', function (err) {
   console.error(err)
 })
 
-p.on('response', function (res) {
+p.on('data', function (res) {
   res.on('end', function () {
     console.log('OK')
   })
