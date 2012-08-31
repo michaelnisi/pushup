@@ -43,7 +43,7 @@ Upload latest commit to S3:
       console.log('%s uploaded', commit)
     })
 
-## INSTALLATION
+## Installation
 
 Install with [npm](http://npmjs.org/):
 
@@ -53,6 +53,6 @@ To use pushup from the command-line:
     
     npm install -g pushup
 
-## LICENSE
+## License
 
 [MIT License](https://raw.github.com/michaelnisi/pushup/master/LICENSE)
