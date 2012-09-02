@@ -55,13 +55,13 @@ Emitted if there was an error.
 
     function (entry) {}
 
-Emitted when an entry is added from the commit.
+Emitted when uploading of a file begins. The file is streamed to S3. The `entry` objects emit 'progress' events with following properties: `written`, `total`, and `percent`.
 
 ### Event:'commit'
 
     function (commit) {}
 
-Emitted when the first line of the commit is written to the Stream.  
+Emitted when the abbreviated commit object name is written to the Stream.   
 
 ### Event:'end'
 
@@ -73,7 +73,7 @@ Emitted when the upload is complete.
 
     function (response) {}
 
-Emitted when uploading of a file completes.
+The 'data' event emits the response from S3 when uploading of a file completes.
 
 ## Installation
 
@@ -81,7 +81,7 @@ Install with [npm](http://npmjs.org/):
 
     npm install pushup
 
-To use pushup from the command-line:
+To `pushup` from the command-line:
     
     npm install -g pushup
 

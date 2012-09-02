@@ -47,7 +47,7 @@ test('git commit', function (t) {
 test('lines', function (t) {
   show(dir)
     .pipe(es.writeArray(function (err, lines) {
-      t.equals(lines.length, 2)
+      t.equals(lines.length, 1)
       t.equals(lines.pop(), 'hello.js')
       t.end()
     })

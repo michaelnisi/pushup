@@ -3,8 +3,9 @@
 var pushup = require('../index.js')
   , statSync = require('fs').statSync
   , getProps = require('../lib/getProps.js')
+  , show = require('../lib/show.js')
 
-;(function () {
+  ;(function () {
   var arg = process.argv.splice(2)
     , props = getProps()
     , repo = arg[0]
@@ -16,14 +17,7 @@ var pushup = require('../index.js')
 
   props.repo = repo
   
-  pushup(props)
-    .on('entry', function (entry) {
-      console.log(entry.name)
-    })
-    .on('error', function (err) {
-      console.error(err)
-    })
-    .on('end', function () {
-      console.log('OK')
-    })  
+  show(repo)
+    .pipe(pushup(props))
+    .pipe(process.stdout)
 })()

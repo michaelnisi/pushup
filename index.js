@@ -4,15 +4,16 @@ var validateProps = require('./lib/validateProps.js')
   , es = require('event-stream')
   , knox = require('knox')
   , Stream = require('stream').Stream
-  , show = require('./lib/show.js')
   , join = require('path').join
 
 function pushup (props, callback) {
   var stream = new Stream()
     , client = knox.createClient(props)
-    , files = show(props.repo)
     , error = validateProps(props, stream)
-    , commit = null
+    , ended = false
+    , paused = false
+    , files = null
+    , count = 0
 
   if (error) {
     if (callback) callback(error)
@@ -24,41 +25,77 @@ function pushup (props, callback) {
   stream.readable = true
   stream.writable = true
 
+  stream.resume = function () {
+    if (ended) {
+      throw new Error('Resume after ended')
+    }
+    paused = false
+    upload()
+    stream.emit('resume')
+  }
+
+  stream.pause = function () {
+    if (ended) {
+      throw new Error('Pause after ended')
+    }
+    paused = true
+    stream.emit('pause')
+  }
+
   stream.end = function () {
+    if (count) return
+    ended = true
     stream.emit('end')
     if (callback) callback(error, commit)
   }
 
   stream.write = function (data) {
-    if (!commit) {
-      commit = data.split(' ').shift()
-      stream.emit('commit', commit)
-      return true
+    if (!files) {
+      count = 0
+      files = []
+    }
+    
+    files.push(data)
+     
+    upload()
+
+    return true 
+  }
+
+  function upload () {
+    if (!files.length && !count) {
+      stream.end()
+      return
+    }
+   
+    stream.pause()
+
+    var file = files.shift()
+    
+    if (!file) {
+      return
     }
 
-    var entry = client.putFile(data, '/' + data, function (err, res) {
+    var entry = client.putFile(file, '/' + file, responseHandler)
+    
+    count++
+
+    function responseHandler (err, res) {
+      count--
       if (err) {
         error = err
         stream.emit('error', err)
-        return true
+        if (!ended) stream.resume()
+        return
       }
+      stream.emit('data', res.socket._httpMessage.url + '\n')
+      if (!ended) stream.resume()
+    }
 
-      stream.emit('data', res)
-      stream.emit('resume')
-    })
+    entry.name = file
     
-    entry.name = data
-
-    stream.emit('pause')
     stream.emit('entry', entry)
-    
-    return true
   }
 
-  files.on('error', function (err) {
-    error = err
-    stream.emit('error', err)
-  })
-
-  return files.pipe(stream)
+  return stream
 }
