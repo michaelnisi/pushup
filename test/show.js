@@ -5,10 +5,16 @@ var test = require('tap').test
   , show = require('../lib/show.js')
   , dir = '/tmp/pushup-' + Math.floor(Math.random() * (1<<24))
   , spawn = require('child_process').spawn
+  , statIsGit = require('../lib/statIsGit.js')
 
 test('setup', function (t) {
   fs.mkdirSync(dir, 0700)
   process.chdir(dir)
+  t.end()
+})
+
+test('isGit', function (t) {
+  t.notok(statIsGit(dir), 'should not be a git-repo')
   t.end()
 })
 
@@ -19,6 +25,11 @@ test('git init', function (t) {
     t.ok(true, 'init should be ok')
     t.end()    
   })
+})
+
+test('isGit', function (t) {
+  t.ok(statIsGit(dir), 'should be a git-repo')
+  t.end()
 })
 
 test('write', function (t) {

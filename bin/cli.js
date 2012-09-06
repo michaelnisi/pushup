@@ -4,6 +4,7 @@ var pushup = require('../index.js')
   , statSync = require('fs').statSync
   , getProps = require('../lib/getProps.js')
   , show = require('../lib/show.js')
+  , statIsGit = require('../lib/statIsGit.js')
   , push = require('../lib/push.js')
   , cp = require('../lib/cp.js')
   , cpr = require('../lib/cpr.js')
@@ -11,12 +12,16 @@ var pushup = require('../index.js')
 ;(function () {
   var arg = process.argv.splice(2)
     , props = getProps()
-    , repo = arg[0]
+    , path = arg[0]
 
-  if (!repo || !statSync(repo).isDirectory()) {
-    console.error('Usage: pushup path/to/repo')
-    return
+  
+  
+  if (statIsGit(path)) { 
+    push(props, path)
+  } else {
+    console.log('Not implemented yet')
   }
-
-  push(props, repo)
 })()
+
+function isGit (path) {
+}
