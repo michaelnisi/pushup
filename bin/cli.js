@@ -4,8 +4,11 @@ var pushup = require('../index.js')
   , statSync = require('fs').statSync
   , getProps = require('../lib/getProps.js')
   , show = require('../lib/show.js')
+  , push = require('../lib/push.js')
+  , cp = require('../lib/cp.js')
+  , cpr = require('../lib/cpr.js')
 
-  ;(function () {
+;(function () {
   var arg = process.argv.splice(2)
     , props = getProps()
     , repo = arg[0]
@@ -15,9 +18,5 @@ var pushup = require('../index.js')
     return
   }
 
-  props.repo = repo
-  
-  show(repo)
-    .pipe(pushup(props))
-    .pipe(process.stdout)
+  push(props, repo)
 })()

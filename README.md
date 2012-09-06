@@ -1,12 +1,22 @@
-# pushup - push latest commit to S3
+# pushup - upload to S3
 
 [![Build Status](https://secure.travis-ci.org/michaelnisi/pushup.png)](http://travis-ci.org/michaelnisi/pushup)
 
 ## Description
 
-Pushup uploads the latest commit in a given branch of a Git repository to [S3](http://aws.amazon.com/s3/).
+Pushup uploads files to a [S3](http://aws.amazon.com/s3/) bucket.
 
 ## CLI Usage
+
+    pushup file
+
+    pushup file-1 ... file-n
+    
+    pushup directory
+
+    pushup git-repo
+
+    pushup file directory repo file-1 ... file-n
 
 Create repo, and add a file:
 
