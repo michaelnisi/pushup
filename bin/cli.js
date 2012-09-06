@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 var getProps = require('../lib/getProps.js')
-  , statIsGit = require('../lib/statIsGit.js')
-  , push = require('../lib/push.js')
+  , push = require('./push.js')
+  , statIsGit = require('./statIsGit.js')
 
 ;(function () {
   var arg = process.argv.splice(2)

@@ -5,7 +5,7 @@ var test = require('tap').test
   , show = require('../lib/show.js')
   , dir = '/tmp/pushup-' + Math.floor(Math.random() * (1<<24))
   , spawn = require('child_process').spawn
-  , statIsGit = require('../lib/statIsGit.js')
+  , statIsGit = require('../bin/statIsGit.js')
 
 test('setup', function (t) {
   fs.mkdirSync(dir, 0700)
