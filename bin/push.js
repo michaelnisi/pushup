@@ -1,4 +1,4 @@
-var show = require('../lib/show.js')
+var show = require('./show.js')
   , pushup = require('../index.js')
 
 module.exports = push

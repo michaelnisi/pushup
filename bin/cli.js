@@ -3,6 +3,7 @@
 var getProps = require('../lib/getProps.js')
   , push = require('./push.js')
   , statIsGit = require('./statIsGit.js')
+  , cp = require('./cp.js')
 
 ;(function () {
   var arg = process.argv.splice(2)
@@ -12,6 +13,8 @@ var getProps = require('../lib/getProps.js')
   if (statIsGit(path)) { 
     push(props, path)
   } else {
-    console.log('Not implemented yet')
+    cp(arg).pipe(pushup)
   }
 })()
+
+
