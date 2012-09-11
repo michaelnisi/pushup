@@ -3,15 +3,11 @@
 module.exports = cpr
 
 var Reader = require('fstream').Reader
-  , Stream = require('stream').Stream
+  , readProps = require('../lib/readProps.js')
 
 function cpr () {
   var props = {}
     , reader = new Reader(props)
-    , stream = new Stream()
-  
-  stream.writable = false
-  stream.readable = true
-
-  return stream
+      
+  return reader.pipe(readProps('path'))
 }
