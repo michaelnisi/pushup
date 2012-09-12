@@ -7,7 +7,11 @@ var Reader = require('fstream').Reader
   , pushup = require('../lib/index.js')
 
 function cpr (props, path) {
-  return new Reader({ path:path })
+  var opts = { path: path }
+  var reader = new Reader(opts)
+  
+  return reader
     .pipe(fish('path'))
     .pipe(pushup(props))
+    .pipe(process.stdout)
 }
