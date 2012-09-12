@@ -1,18 +1,18 @@
 var test = require('tap').test
-  , validate = require('../lib/validateProps.js')
+  , validateProps = require('../lib/validateProps.js')
 
 test('undefined', function (t) {
-  t.same(validate(), new Error('props required'))
+  t.same(validateProps(), new Error('props required'))
   t.end()
 })
 
 test('null', function (t) {
-  t.same(validate(null), new Error('props required'))
+  t.same(validateProps(null), new Error('props required'))
   t.end()
 })
 
 test('empty', function (t) {
-  t.same(validate({}), new Error('props required'))
+  t.same(validateProps({}), new Error('props required'))
   t.end()
 })
 
@@ -24,6 +24,6 @@ test('missing', function (t) {
     , repo: null
   }
 
-  t.same(validate(props), new Error('props.repo required'))
+  t.same(validateProps(props), new Error('props.repo required'))
   t.end()
 })

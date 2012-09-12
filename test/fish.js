@@ -8,6 +8,8 @@ test('fish', function(t) {
   , { name: 'Larry' }
   , { name: 'Curly' }
   , { id: '123' } 
+  , null
+  , undefined
   ]
 
   var expected = ['Moe', 'Larry', 'Curly']

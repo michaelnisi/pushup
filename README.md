@@ -16,27 +16,11 @@ Pushup uploads files to a [S3](http://aws.amazon.com/s3/) bucket.
 
     pushup git-repo
 
-    pushup file directory repo file-1 ... file-n
-
-Create repo, and add a file:
-
-    mkdir site
-    cd site
-    git init
-    echo Hello > index.html
-    git add .
-    git commit -m 'Add index.html'
-    cd
-    
-Export your AWS security credentials:
+To use pushup you need to export your AWS security credentials:
 
     export AWS_ACCESS_KEY_ID=123
     export AWS_SECRET_ACCESS_KEY=42
     export S3_BUCKET=kahuna
-    
-Upload latest commit to S3:
-
-    pushup site
 
 ## Library Usage
 
@@ -72,7 +56,6 @@ Emitted when uploading of a file begins. The file is streamed to S3. The `entry`
     function (commit) {}
 
 Emitted when the abbreviated commit object name is written to the Stream.   
-
 ### Event:'end'
 
     function () {}
