@@ -6,7 +6,8 @@ test('fish', function(t) {
   var objs = [
     { name: 'Moe' }
   , { name: 'Larry' }
-  , { name: 'Curly' } 
+  , { name: 'Curly' }
+  , { id: '123' } 
   ]
 
   var expected = ['Moe', 'Larry', 'Curly']
@@ -14,7 +15,8 @@ test('fish', function(t) {
   es.readArray(objs)
     .pipe(fish('name'))
     .pipe(es.writeArray(function (err, lines) {
-      t.deepEquals(lines, expected, 'should be equal')      
+      t.equals(3, lines.length)
+      t.deepEquals(lines, expected, 'should be array of names')      
       t.end()
     }))
 })

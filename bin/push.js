@@ -1,3 +1,5 @@
+// upload latest commit to S3
+
 var show = require('./show.js')
   , pushup = require('../index.js')
 

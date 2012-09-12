@@ -1,13 +1,13 @@
-// stream paths of all files in a directory recursively
+// upload directory recursively to S3
 
 module.exports = cpr
 
 var Reader = require('fstream').Reader
-  , readProps = require('../lib/readProps.js')
+  , fish = require('../lib/fish.js')
+  , pushup = require('../lib/index.js')
 
-function cpr () {
-  var props = {}
-    , reader = new Reader(props)
-      
-  return reader.pipe(readProps('path'))
+function cpr (props, path) {
+  return new Reader({ path:path })
+    .pipe(fish('path'))
+    .pipe(pushup(props))
 }
