@@ -30,11 +30,12 @@ To use pushup you need to export your AWS security credentials:
       , key: 123
       , secret: 42
       , bucket: 'kahuna'
-      , repo: 'path/to/repo'
     }
+
+    var files = ['index.html', 'css/style.css', 'js/main.js']
     
-    pushup(props, function (err, commit) {
-      console.log('%s uploaded', commit)
+    pushup(props, files, function (err) {
+      console.log('OK')
     })
 
 `pushup` returns a readable `Stream` that emits following events:
@@ -43,7 +44,7 @@ To use pushup you need to export your AWS security credentials:
 
     function (err) {}
 
-Emitted if there was an error.
+Emitted if an error occured.
 
 ### Event:'entry'
 
@@ -51,11 +52,6 @@ Emitted if there was an error.
 
 Emitted when uploading of a file begins. The file is streamed to S3. The `entry` objects emit 'progress' events with following properties: `written`, `total`, and `percent`.
 
-### Event:'commit'
-
-    function (commit) {}
-
-Emitted when the abbreviated commit object name is written to the Stream.   
 ### Event:'end'
 
     function () {}
@@ -66,7 +62,7 @@ Emitted when the upload is complete.
 
     function (response) {}
 
-The 'data' event emits the response from S3 when uploading of a file completes.
+The 'data' event emits the url response from S3 when uploading of a file completes.
 
 ## Installation
 

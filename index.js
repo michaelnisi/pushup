@@ -46,7 +46,7 @@ function pushup (props, callback) {
     if (count) return
     ended = true
     stream.emit('end')
-    if (callback) callback(error, commit)
+    if (callback) callback(error)
   }
 
   stream.write = function (data) {
