@@ -1,26 +1,13 @@
-var pushup = require('../index.js')
-  , getProps = require('../lib/getProps.js')
+var pushup = require('pushup')
 
-var p = pushup(getProps(), function (err, commit) {
-  err ? console.error(err) : console.log(commit)    
-})
+var props = { 
+  , key: 123
+  , secret: 42
+  , bucket: 'kahuna'
+}
 
-p.on('entry', function (entry) {
-  entry.on('progress', function (prog) {
-    console.log('%s %d',  entry.name, prog.percent)
-  })
-})
+var files = ['index.html', 'css/style.css', 'js/main.js']
 
-p.on('error', function (err) {
-  console.error(err)
-})
-
-p.on('data', function (res) {
-  res.on('end', function () {
-    console.log('OK')
-  })
-})
-
-p.on('commit', function (commit) {
-  console.log(commit)
+pushup(props, files, function (err) {
+  err ? console.error(err) : console.log('OK')
 })

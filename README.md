@@ -8,15 +8,13 @@ Pushup uploads files to a [S3](http://aws.amazon.com/s3/) bucket.
 
 ## CLI Usage
 
-    pushup file
+    pushup file ...
 
-    pushup file-1 ... file-n
-    
     pushup directory
 
     pushup git-repo
 
-To use pushup you need to export your AWS security credentials:
+Pushup's CLI retrieves the AWS security credentials from its environment; thus, you have to export them:
 
     export AWS_ACCESS_KEY_ID=123
     export AWS_SECRET_ACCESS_KEY=42
@@ -25,7 +23,7 @@ To use pushup you need to export your AWS security credentials:
 ## Library Usage
 
     var pushup = require('pushup')
-    
+
     var props = { 
       , key: 123
       , secret: 42
@@ -33,9 +31,9 @@ To use pushup you need to export your AWS security credentials:
     }
 
     var files = ['index.html', 'css/style.css', 'js/main.js']
-    
+
     pushup(props, files, function (err) {
-      console.log('OK')
+      err ? console.error(err) : console.log('OK')
     })
 
 `pushup` returns a readable `Stream` that emits following events:
@@ -71,7 +69,7 @@ Install with [npm](http://npmjs.org/):
     npm install pushup
 
 To `pushup` from the command-line:
-    
+
     npm install -g pushup
 
 ## License
