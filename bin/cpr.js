@@ -1,9 +1,9 @@
-// upload directory recursively to S3
+// cpr - upload directory and its entire subtree to S3
 
 module.exports = cpr
 
 var Reader = require('fstream').Reader
-  , fish = require('../lib/fish.js')
+  , fish = require('fish')
   , pushup = require('../lib/index.js')
 
 function cpr (props, path) {
