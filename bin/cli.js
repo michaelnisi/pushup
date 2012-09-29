@@ -10,8 +10,8 @@ var getProps = require('../lib/getProps.js')
 ;(function () {
   var arg = process.argv.splice(2)
     , props = getProps()
-    , path = arg[0]
-  
+    , path = arg[0] || process.cwd()
+ 
   if (statIsGit(path)) { 
     push(props, path)
   } else if (statSync(path).isDirectory()) {

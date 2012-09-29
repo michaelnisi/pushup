@@ -1,6 +1,6 @@
-// upload latest commit to S3
+// push - push latest commit to S3
 
-var show = require('./show.js')
+var show = require('../lib/show.js')
   , pushup = require('../index.js')
 
 module.exports = push

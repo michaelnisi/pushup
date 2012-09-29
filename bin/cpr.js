@@ -4,7 +4,7 @@ module.exports = cpr
 
 var Reader = require('fstream').Reader
   , cop = require('cop')
-  , pushup = require('../lib/index.js')
+  , pushup = require('../index.js')
 
 function cpr (props, path) {
   var opts = { path: path }
