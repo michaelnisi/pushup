@@ -22,7 +22,7 @@
     "url": "http://michaelnisi.com"
   },
   "license": "MIT",
-  "description": "Upload last commit to S3",
+  "description": "upload last commit to S3",
   "keywords": [
     "upload",
     "commit",
@@ -30,7 +30,8 @@
   ],
   "dependencies": {
     "event-stream": ">=3.0.2",
-    "knox": ">=0.3.0" 
+    "knox": ">=0.3.0",
+    "cop": "*"
   },
   "devDependencies": {
     "tap": ">=0.3.1"
