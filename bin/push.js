@@ -5,8 +5,8 @@ var show = require('../lib/show.js')
 
 module.exports = push
 
-function push (props, repo) {
-  show(repo)
+function push (props, path) {
+  show(path)
     .pipe(pushup(props))
     .pipe(process.stdout)
 }

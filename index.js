@@ -20,8 +20,6 @@ function pushup (props, callback) {
     return error
   }
 
-  process.chdir(props.repo)
-
   stream.readable = true
   stream.writable = true
 
