@@ -3,7 +3,7 @@
 module.exports = cpr
 
 var Reader = require('fstream').Reader
-  , fish = require('fish')
+  , cop = require('cop')
   , pushup = require('../lib/index.js')
 
 function cpr (props, path) {
@@ -11,7 +11,7 @@ function cpr (props, path) {
   var reader = new Reader(opts)
   
   return reader
-    .pipe(fish('path'))
+    .pipe(cop('path'))
     .pipe(pushup(props))
     .pipe(process.stdout)
 }
