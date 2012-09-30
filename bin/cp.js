@@ -1,4 +1,4 @@
-// upload files to S3
+// cp - copy files to S3
 
 var es = require('event-stream')
   , pushup = require('../index.js')

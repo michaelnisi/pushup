@@ -1,4 +1,4 @@
-// cpr - upload directory and its entire subtree to S3
+// cpr - copy directory and its entire subtree to S3
 
 module.exports = cpr
 
