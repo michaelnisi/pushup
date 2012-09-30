@@ -14,9 +14,9 @@ var getProps = require('../lib/getProps.js')
  
   if (statIsGit(path)) { 
     push(props, path)
-  } else if (statSync(path).isDirectory()) {
-    cpr(props, path)
-  } else {
+  } else if (statSync(path).isFile()) {
     cp(props, arg)
+  } else {
+    cpr(props, path)
   }
 })()
