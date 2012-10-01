@@ -11,8 +11,8 @@ var getProps = require('../lib/getProps.js')
   var arg = process.argv.splice(2)
     , props = getProps()
     , path = arg[0] || process.cwd()
- 
-  if (statIsGit(path)) { 
+
+  if (statIsGit(path)) {
     push(props, path)
   } else if (statSync(path).isFile()) {
     cp(props, arg)

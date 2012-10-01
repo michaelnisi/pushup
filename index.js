@@ -9,7 +9,7 @@ var validateProps = require('./lib/validateProps.js')
 function pushup (props, callback) {
   var stream = new Stream()
     , client = knox.createClient(props)
-    , error = validateProps(props, stream)
+    , error = validateProps(props)
     , ended = false
     , paused = false
     , files = null
