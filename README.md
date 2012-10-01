@@ -4,7 +4,7 @@
 
 ## Description
 
-The pushup node module uploads files to a [S3](http://aws.amazon.com/s3/) bucket. Its main usage is to upload changed files in the latest commit of a git repository, but it also enables you to upload files and directories.
+The pushup node module uploads files to a [S3](http://aws.amazon.com/s3/) bucket. Its main purpose is to upload the content of the latest commit (in a git repository), however, it can also be used to upload files and directories.
 
 ## CLI Usage
 
@@ -14,6 +14,8 @@ The pushup node module uploads files to a [S3](http://aws.amazon.com/s3/) bucket
 
     pushup directory
 
+The first synopsis uploads the content of the latest commit of the git-repo found on the specified path. The second synopsis copies a list of files, while the third synopsis copies a directory and its entire subtree to S3. 
+
 Pushup's CLI retrieves the AWS security credentials from its environment; thus, you have to export them:
 
     export AWS_ACCESS_KEY_ID=123
@@ -22,19 +24,7 @@ Pushup's CLI retrieves the AWS security credentials from its environment; thus, 
 
 ## Library Usage
 
-    var pushup = require('pushup')
-
-    var props = { 
-      , key: 256
-      , secret: 42
-      , bucket: 'kahuna'
-    }
-
-    var files = ['index.html', 'css/style.css', 'js/main.js']
-
-    pushup(props, files, function (err) {
-      err ? console.error(err) : console.log('OK')
-    })
+The pushup function returns a Trough-Stream—to which you can write filenames and read target URLs. A target URL is emitted for each successful upload to S3.
 
 ### Push latest commit to S3
 
@@ -48,7 +38,9 @@ Pushup's CLI retrieves the AWS security credentials from its environment; thus, 
       , bucket: 'kahuna'
     }
     
-    show(path).pipe(pushup(props)).pipe(process.stdout)
+    show(path)
+      .pipe(pushup(props))
+      .pipe(process.stdout)
 
 ### Copy files to S3
 
@@ -62,7 +54,9 @@ Pushup's CLI retrieves the AWS security credentials from its environment; thus, 
       , bucket: 'kahuna'
     }
 
-    es.readArray(files).pipe(pushup(props)).pipe(process.stdout)
+    es.readArray(files)
+      .pipe(pushup(props))
+      .pipe(process.stdout)
 
 ### Copy directory and its entire subtree to S3
 
