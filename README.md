@@ -9,12 +9,10 @@ The pushup node module uploads files to a [S3](http://aws.amazon.com/s3/) bucket
 ## CLI Usage
 
     pushup git-repo
-
     pushup file ...
-
     pushup directory
 
-The first synopsis uploads the content of the latest commit of the git-repo found on the specified path. The second synopsis copies a list of files, while the third synopsis copies a directory and its entire subtree to S3. 
+In the first synopsis form, pushup uploads the content of the latest commit of the git-repo found on the specified path. In the second synopsis form, a list of files is copied to S3; while in the third form a directory and its entire subtree is copied. 
 
 Pushup's CLI retrieves the AWS security credentials from its environment; thus, you have to export them:
 
