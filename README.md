@@ -16,7 +16,7 @@ In the first synopsis form, pushup uploads the content of the git-repo's latest 
 
 Pushup's CLI retrieves the AWS security credentials from its environment; thus, you have to export them:
 
-    export AWS_ACCESS_KEY_ID=123
+    export AWS_ACCESS_KEY_ID=256
     export AWS_SECRET_ACCESS_KEY=42
     export S3_BUCKET=kahuna
 
@@ -35,7 +35,7 @@ The `pushup` function returns a Through-Stream, to which you can write filenames
       , secret: 42
       , bucket: 'kahuna'
     }
-    
+
     show(path)
       .pipe(pushup(props))
       .pipe(process.stdout)
