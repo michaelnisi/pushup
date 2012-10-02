@@ -29,7 +29,7 @@
     "S3"
   ],
   "dependencies": {
-    "fstream: "0.1.x",
+    "fstream": "0.1.x",
     "event-stream": "3.0.x",
     "knox": "0.3.x",
     "cop": "*"
