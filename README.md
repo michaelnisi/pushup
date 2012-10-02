@@ -69,20 +69,17 @@ The `pushup` function returns a Through-Stream, to which you can write filenames
       , pushup = require('pushup')
       , relative = require('path').relative
       , path = 'path/to/directory'
-      , opts = { path: path }
-      , reader = new Reader(opts)
 
     process.chdir(path)
-
-    reader
-      .pipe(cop(relativize))
+      
+    new Reader({ path:'.' })
+      .pipe(cop(filter))
       .pipe(pushup(props))
       .pipe(process.stdout)
 
     function filter (obj) {
       var isFile = obj.type === 'File'
       return isFile ? relative(process.cwd(), obj.path) : undefined
-
     }
 
 ## Events
