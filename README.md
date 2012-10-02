@@ -85,7 +85,7 @@ The `pushup` function returns a Through-Stream, to which you can write filenames
 
 ## Events
 
-The `pushup` function returns a readable `Stream` that emits following events:
+The `pushup` function returns a readable and writable [Stream](http://nodejs.org/api/stream.html) that emits following events:
 
 ### Event:'error'
 

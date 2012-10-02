@@ -8,17 +8,16 @@ var Reader = require('fstream').Reader
   , relative = require('path').relative
 
 function cpr (props, path) {
- var opts = { path: path }
-   , reader = new Reader(opts)
-  
   process.chdir(path)
   
-  return reader
-    .pipe(cop(relativize))
+  return new Reader({ path:'.' })
+    .pipe(cop(filter))
     .pipe(pushup(props))
     .pipe(process.stdout)
 }
 
-function relativize (obj) {
-  return relative(process.cwd(), obj.path)
+function filter (obj) {
+  var isFile = obj.type === 'File'
+  return isFile ? relative(process.cwd(), obj.path) : undefined
+
 }

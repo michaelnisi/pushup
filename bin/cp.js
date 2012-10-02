@@ -6,6 +6,7 @@ var es = require('event-stream')
 module.exports = cp
 
 function cp (props, files) {
+  console.log('cp')
   return es.readArray(files)
     .pipe(pushup(props))
     .pipe(process.stdout)
