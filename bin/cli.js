@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 var getProps = require('../lib/getProps.js')
-  , push = require('./push.js')
-  , statIsGit = require('./statIsGit.js')
-  , cp = require('./cp.js')
-  , cpr = require('./cpr.js')
+  , push = require('../lib/push.js')
+  , statIsGit = require('../lib/statIsGit.js')
+  , cp = require('../lib/cp.js')
+  , cpr = require('../lib/cpr.js')
   , statSync = require('fs').statSync
 
 ;(function () {
