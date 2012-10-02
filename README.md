@@ -27,7 +27,7 @@ The `pushup` function returns a Through-Stream, to which you can write filenames
 ### Push latest commit to S3
 
     var show = require('../lib/show.js')
-      , pushup = require('../index.js')
+      , pushup = require('pushup')
       , path = 'path/to/repo'
 
     var props = {
@@ -43,7 +43,7 @@ The `pushup` function returns a Through-Stream, to which you can write filenames
 ### Copy files to S3
 
     var es = require('event-stream')
-      , pushup = require('../index.js')
+      , pushup = require('pushup')
       , files = ['path/to/file-1', 'path/to/file-2']
 
     var props = {
@@ -66,7 +66,7 @@ The `pushup` function returns a Through-Stream, to which you can write filenames
 
     var Reader = require('fstream').Reader
       , cop = require('cop')
-      , pushup = require('../index.js')
+      , pushup = require('pushup')
       , relative = require('path').relative
       , path = 'path/to/directory'
       , opts = { path: path }
@@ -79,8 +79,10 @@ The `pushup` function returns a Through-Stream, to which you can write filenames
       .pipe(pushup(props))
       .pipe(process.stdout)
 
-    function relativize (obj) {
-      return relative(process.cwd(), obj.path)
+    function filter (obj) {
+      var isFile = obj.type === 'File'
+      return isFile ? relative(process.cwd(), obj.path) : undefined
+
     }
 
 ## Events
