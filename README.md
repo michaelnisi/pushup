@@ -12,7 +12,7 @@ The pushup node module uploads files to a [S3](http://aws.amazon.com/s3/) bucket
     pushup file ...
     pushup directory
 
-In the first synopsis form, pushup uploads the content of the latest commit of the git-repo found on the specified path. In the second synopsis form, a list of files is copied to S3; while in the third form a directory and its entire subtree is copied. 
+In the first synopsis form, pushup uploads the content of git-repo's latest commit. In the second synopsis form, a list of files is copied to S3; while in the third form, a directory and its entire subtree is copied. 
 
 Pushup's CLI retrieves the AWS security credentials from its environment; thus, you have to export them:
 
@@ -22,7 +22,7 @@ Pushup's CLI retrieves the AWS security credentials from its environment; thus, 
 
 ## Library Usage
 
-The pushup function returns a Trough-Stream—to which you can write filenames and read target URLs. A target URL is emitted for each successful upload to S3.
+The `pushup` function returns a Through-Stream, to which you can write filenames, and from which you can read target URLs. A target URL is emitted for each successful upload to S3.
 
 ### Push latest commit to S3
 
@@ -85,7 +85,7 @@ The pushup function returns a Trough-Stream—to which you can write filenames a
 
 ## Events
 
-`pushup` returns a readable `Stream` that emits following events:
+The `pushup` function returns a readable `Stream` that emits following events:
 
 ### Event:'error'
 
