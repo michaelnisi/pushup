@@ -4,7 +4,7 @@
 
 ## Description
 
-The pushup node module uploads files to a [S3](http://aws.amazon.com/s3/) bucket. Its main purpose is to upload the content of the latest commit (in a git repository), however, it can also be used to upload files and directories.
+The pushup node module uploads files to a [S3](http://aws.amazon.com/s3/) bucket. Its main purpose is to upload the content of the latest commit (in a git repository); however, you can also use it to simply copy files or directories to S3.
 
 ## CLI Usage
 
@@ -69,10 +69,11 @@ The `pushup` function returns a Through-Stream, to which you can write filenames
       , pushup = require('pushup')
       , relative = require('path').relative
       , path = 'path/to/directory'
-
+      , reader = new Reader({ path:'.'} )
+   
     process.chdir(path)
       
-    new Reader({ path:'.' })
+    reader
       .pipe(cop(filter))
       .pipe(pushup(props))
       .pipe(process.stdout)
