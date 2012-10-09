@@ -26,7 +26,7 @@ The `pushup` function returns a Through-Stream, to which you can write filenames
 
 ### Push latest commit to S3
 
-    var show = require('../lib/show.js')
+    var show = require('pushup/lib/show')
       , pushup = require('pushup')
       , path = 'path/to/repo'
 
