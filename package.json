@@ -1,14 +1,7 @@
 {
   "name": "pushup",
-  "version": "0.3.5",
+  "version": "0.4.0",
   "main": "index.js",
-  "directories": {
-    "example": "example",
-    "test": "test"
-  },
-  "scripts": {
-    "test": "tap test/*"
-  },
   "bin": {
     "pushup": "./bin/cli.js"
   },
@@ -22,22 +15,22 @@
     "url": "http://michaelnisi.com"
   },
   "license": "MIT",
-  "description": "upload last commit to S3",
+  "description": "copy files to S3",
   "keywords": [
     "upload",
+    "copy",
+    "files",
     "commit",
     "S3"
   ],
   "dependencies": {
+    "showf": "",
+    "isgit": "", 
     "fstream": "0.1.x",
     "event-stream": "3.0.x",
-    "knox": "0.3.x",
-    "cop": ""
-  },
-  "devDependencies": {
-    "tap": ">=0.3.1"
+    "knox": "0.8.x"
   },
   "engines": {
-    "node": ">=0.8.0"
+    "node": "0.10.x"
   }
 }
