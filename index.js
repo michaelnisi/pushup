@@ -3,10 +3,11 @@
 
 var knox = require('knox')
   , Transform = require('stream').Transform
-  , opts = require('./lib/opts.js')
+  , env = require('./lib/env.js')
+  , path = require('path')
 
 module.exports = function (opts) {
-  opts = opts || opts()
+  opts = opts || env()
 
   var stream = new Transform()
     , client = knox.createClient(opts)
@@ -14,14 +15,17 @@ module.exports = function (opts) {
   stream._transform = function (chunk, enc, cb) {
     var file = chunk.toString()
     var entry = client.putFile(file, '/' + file, function (er, res) {
-      if (er) {
+      if (er) stream.emit('error', er)
+      res.on('error', function (er) {
         stream.emit('error', er)
-      }
-      stream.push(res.socket._httpMessage.url)
-      entry.name = file
-      stream.emit('entry', entry)
-      cb()
+      })
+      res.on('end', function () {
+        stream.push(res.socket._httpMessage.path + '\n')
+        cb()
+      })
+      res.resume()
     })
+    stream.emit('entry', entry)
   }
 
   return stream

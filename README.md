@@ -1,10 +1,8 @@
 # pushup - upload to S3
 
-[![Build Status](https://secure.travis-ci.org/michaelnisi/pushup.png)](http://travis-ci.org/michaelnisi/pushup)
-
 ## Description
 
-The pushup node module uploads files to a [S3](http://aws.amazon.com/s3/) bucket. Its main purpose is to upload the content of the latest commit (in a git repository); however, you can also use it to simply copy files or directories to S3.
+The pushup [Node.js](http://nodejs.org/) module uploads files to a [S3](http://aws.amazon.com/s3/) bucket. Its main purpose is to upload the content of the latest commit (in a git repository); however, you can also use it to simply copy files or directories to S3.
 
 ## CLI Usage
 
@@ -14,11 +12,12 @@ The pushup node module uploads files to a [S3](http://aws.amazon.com/s3/) bucket
 
 In the first synopsis form, pushup uploads the content of the git-repo's latest commit. In the second synopsis form, a list of files is copied to S3; while in the third form, a directory and its entire subtree is copied. If you `pushup` without arguments, the current directory will be used. 
 
-Pushup's CLI retrieves the AWS security credentials from its environment; thus, you have to export them:
+As `pushup` attempts to get the AWS security credentials from its environment, you may export them:
 
     export AWS_ACCESS_KEY_ID=256
     export AWS_SECRET_ACCESS_KEY=42
     export S3_BUCKET=kahuna
+    export S3_REGION=us-standard
 
 ## Library Usage
 
@@ -83,43 +82,25 @@ The `pushup` function returns a Through-Stream, to which you can write filenames
       return isFile ? relative(process.cwd(), obj.path) : undefined
     }
 
-## Events
+### pushup(opts)
 
 The `pushup` function returns a readable and writable [Stream](http://nodejs.org/api/stream.html) that emits following events:
 
-### Event:'error'
-
-    function (err) {}
-
-Emitted if an error occured.
-
 ### Event:'entry'
 
-    function (entry) {}
-
-Emitted when uploading of a file begins. The file is streamed to S3. The `entry` objects emit 'progress' events with following properties: `written`, `total`, and `percent`.
-
-### Event:'end'
-
-    function () {}
-
-Emitted when the upload is complete.
-
-### Event:'data'
-
-    function (response) {}
-
-The 'data' event emits the url response from S3 when uploading of a file completes.
+The 'entry' event is emitted when uploading of a file begins. The file is streamed to S3. The `entry` objects emit 'progress' events with following properties: `written`, `total`, and `percent`.
 
 ## Installation
 
-Install with [npm](http://npmjs.org/):
+With [npm](http://npmjs.org/) do:
 
     npm install pushup
 
 To `pushup` from the command-line:
 
     npm install -g pushup
+
+[![NPM](https://nodei.co/npm/pushup.png)](https://npmjs.org/package/pushup)
 
 ## License
 
