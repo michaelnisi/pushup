@@ -25,10 +25,12 @@
   ],
   "dependencies": {
     "showf": "",
-    "isgit": "", 
-    "fstream": "0.1.x",
-    "event-stream": "3.0.x",
     "knox": "0.8.x"
+  },
+  "devDependencies": {
+    "event-stream": "3.0.x",
+    "tap": "0.4.x",
+    "rimraf": "2.0.x"
   },
   "engines": {
     "node": "0.10.x"
