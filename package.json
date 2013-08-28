@@ -9,6 +9,9 @@
     "type": "git",
     "url": "git://github.com/michaelnisi/pushup.git"
   },
+  "bugs": {
+    "url": "https://github.com/michaelnisi/pushup/issues"
+  },
   "author": {
     "name": "Michael Nisi",
     "email": "michael.nisi@gmail.com",
