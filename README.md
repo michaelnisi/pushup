@@ -83,19 +83,15 @@ The options are passed to [knox](https://github.com/LearnBoost/knox). See [here]
 
 ## Event:'entry'
 
-The `entry` event is emitted when uploading of a file begins. The file is streamed to S3. The `entry` objects—provided by [knox](https://github.com/LearnBoost/knox)—emit 'progress' events with following properties: `written`, `total`, and `percent`.
+This event fires when uploading of a file begins. The file is streamed to S3. The `entry` objects—provided by [knox](https://github.com/LearnBoost/knox)—emit 'progress' events with following properties: `written`, `total`, and `percent`.
 
 ## Installation
 
-With [npm](http://npmjs.org/) do:
-
-    npm install pushup
+[![NPM](https://nodei.co/npm/pushup.png)](https://npmjs.org/package/pushup)
 
 To `pushup` from the command-line:
 
     npm install -g pushup
-
-[![NPM](https://nodei.co/npm/pushup.png)](https://npmjs.org/package/pushup)
 
 ## License
 
