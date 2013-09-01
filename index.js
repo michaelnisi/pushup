@@ -5,6 +5,8 @@ var knox = require('knox')
   , Transform = require('stream').Transform
   , env = require('./lib/env.js')
   , path = require('path')
+  , StringDecoder = require('string_decoder').StringDecoder
+  , decoder = new StringDecoder()
 
 module.exports = function (opts) {
   opts = opts || env()
@@ -13,7 +15,7 @@ module.exports = function (opts) {
     , client = knox.createClient(opts)
 
   stream._transform = function (chunk, enc, cb) {
-    var file = chunk.toString()
+    var file = decoder.write(chunk)
     var entry = client.putFile(file, '/' + file, function (er, res) {
       if (er) stream.emit('error', er)
       res.on('error', function (er) {

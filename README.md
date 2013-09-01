@@ -83,7 +83,7 @@ The options are passed to [knox](https://github.com/LearnBoost/knox). See [here]
 
 ## Event:'entry'
 
-This event fires when uploading of a file begins. The file is streamed to S3. The `entry` objects—provided by [knox](https://github.com/LearnBoost/knox)—emit 'progress' events with following properties: `written`, `total`, and `percent`.
+This event fires when uploading of a file begins. The file is streamed to S3. The `entry` objects, provided by [knox](https://github.com/LearnBoost/knox), emit 'progress' events with following properties: `written`, `total`, and `percent`.
 
 ## Installation
 
