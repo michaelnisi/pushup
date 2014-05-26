@@ -1,97 +1,89 @@
-# pushup - upload to S3
 
-[![David DM](https://david-dm.org/michaelnisi/pushup.png)](http://david-dm.org/michaelnisi/pushup)
+# pushup - copy files to S3
 
-The pushup [Node.js](http://nodejs.org/) module uploads files to a [S3](http://aws.amazon.com/s3/) bucket. Its main purpose is to upload the changed files in the last commit (of a [git](http://git-scm.com/) repository). However, you can also use it to simply copy files or directories to S3. Pushup wraps the [putFile](https://github.com/LearnBoost/knox#put) function of [knox](https://github.com/LearnBoost/knox) into a [Transform stream](http://nodejs.org/api/stream.html#stream_class_stream_transform).
+[![Build Status](https://secure.travis-ci.org/michaelnisi/pushup.svg)](http://travis-ci.org/michaelnisi/pushup) [![David DM](https://david-dm.org/michaelnisi/pushup.svg)](http://david-dm.org/michaelnisi/pushup)
 
-## CLI Usage
+The **pushup** [Node](http://nodejs.org/) module copies local files to an [Amazon S3](http://aws.amazon.com/s3/) bucket. It is designed to deploy static websites hosted on S3 providing some configuration to harness [Amazon CloudFront](https://aws.amazon.com/cloudfront/) content delivery web service.
 
-    pushup git-repo
-    pushup file ...
-    pushup directory
+## Usage
 
-In the first synopsis form, pushup uploads the content of the git-repo's latest commit. In the second synopsis form, a list of files is copied to S3; while in the third form, a directory and its entire subtree is copied. If you `pushup` without arguments, the current directory will be used. 
+**Pushup** is a [Transform](http://nodejs.org/api/stream.html#stream_class_stream_transform) stream to which you write filenames of files you want to copy to S3. If you export your S3 credentials to your process environment, you can neglect the options object.
 
-As `pushup` attempts to get the AWS security credentials from its environment, you may export them:
+```js
+var pushup = require('pushup')
 
-    export AWS_ACCESS_KEY_ID=<api-key-here>
-    export AWS_SECRET_ACCESS_KEY=<secret-here>
-    export S3_BUCKET=bigkahuna
-    export S3_REGION=us-standard
+var push = pushup()
+push.write('/some/file')
+push.write('/some/other/file')
+push.end()
+```
 
-## Library Usage
+Options let you control compression, caching, and the root of the path in the bucket. 
 
-### Push latest commit to S3
+```js
+function ttl() {
+  return { 'file': 3600 * 24 * 30 }
+}
 
-    var showf = require('showf')
-      , pushup = require('pushup')
-      , repo = 'path/to/repo'
+function opts () {
+  return {
+    gzip: true
+  , ttl: ttl()
+  , root: '/some'
+  }
+}
 
-    var opts = {
-      , key: '<api-key-here>'
-      , secret: '<secret-here>'
-      , bucket: 'bigkahuna'
-      , region: 'us-standard'
-    }
+var pushup = require('pushup')
 
-    showf(repo)
-      .pipe(pushup(opts))
-      .pipe(process.stdout)
+var push = pushup(opts())
+push.write('/some/file')
+push.write('/some/other/file')
+push.end()
+```
 
-### Copy files to S3
+## types
 
-    var es = require('event-stream')
-      , pushup = require('pushup')
-      , files = ['path/to/file-1', 'path/to/file-2']
+### ttl()
 
-    es.readArray(files)
-      .pipe(pushup(opts)) // opts like above
-      .pipe(process.stdout)
+An optional bag of settings to configure `Cache-Control` [headers](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html) by file extension or filename in (max-age) delta-seconds. For example:
+```js
+{ '.html': 3600 * 24 * 30, '.css': 3600 * 24 * 30, 'hot.html': 3600 }
+```
 
-### Copy directory and its entire subtree to S3
+### root()
 
-    var Reader = require('fstream').Reader
-      , cop = require('cop')
-      , pushup = require('pushup')
-      , relative = require('path').relative
-      , path = 'path/to/directory'
-      , reader = new Reader({ path:'.'} )
-    
-    process.chdir(path)
-      
-    reader
-      .pipe(cop(filter))
-      .pipe(pushup(opts)) // opts like above
-      .pipe(process.stdout)
+With the `root` option you can control the root of the replicated file tree in your bucket. For example:
 
-    function filter (obj) {
-      var isFile = obj.type === 'File'
-      return isFile ? relative(process.cwd(), obj.path) : undefined
-    }
+```js
+var pushup = require('pushup')
 
-## pushup(opts)
+var push = pushup({root:'/some')
+push.write('/some/file')
+push.write('/some/other/file')
+push.end()
+```
 
-The `pushup` module exports a single function that returns a [Transform stream](http://nodejs.org/api/stream.html#stream_class_stream_transform), to which you can write filenames, and from which you can read target URLs. A target URL is emitted for each successful upload to S3.
+This would copy the files to `/file` and `/other/file` in you S3 bucket. If `root` is `undefined` or your defined `root` is not part of the given file path, the entire path will be replicated.
 
-- `opts` 
-    - `key` Access key ID (a 20-character, alphanumeric string).
-    - `secret` Secret access key (a 40-character string).
-    - `bucket` Amazon S3 bucket name.
-    - `region` AWS region.
+### opts()
+- `gzip` `Boolean()` If set to `true` **pushup** compresses text files before they get uploaded using gzip and sets proper `content/encoding` headers.
+- `ttl` `ttl()`
+- `root` `root()`
+- `tmp` `String()` A directory to store temporary files used if `gzip` is `true`. The directory is deleted when the stream ends. It defaults to `'/tmp/pushup'`.
+- `key` `String()` defaults to `process.env.AWS_ACCESS_KEY_ID`
+- `secret` `String()` defaults to `process.env.AWS_SECRET_ACCESS_KEY`
+- `bucket` `String()` defaults to `process.env.S3_BUCKET`
+- `region` `String()` defaults to `process.env.S3_REGION`
 
-The options are passed to [knox](https://github.com/LearnBoost/knox). See [here](https://github.com/LearnBoost/knox#client-creation-options) for further information.
+## exports
 
-## Event:'entry'
+### pushup([opts()])
 
-This event fires when uploading of a file begins. The file is streamed to S3. The `entry` objects, provided by [knox](https://github.com/LearnBoost/knox), emit 'progress' events with following properties: `written`, `total`, and `percent`.
+A Transform stream that consumes filenames and emits paths of files copied to S3 using [knox](https://github.com/LearnBoost/knox).
 
 ## Installation
 
-[![NPM](https://nodei.co/npm/pushup.png)](https://npmjs.org/package/pushup)
-
-To `pushup` from the command-line:
-
-    npm install -g pushup
+[![NPM](https://nodei.co/npm/pushup.svg)](https://npmjs.org/package/pushup)
 
 ## License
 

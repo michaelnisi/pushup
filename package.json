@@ -1,12 +1,9 @@
 {
   "name": "pushup",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "main": "index.js",
-  "bin": {
-    "pushup": "./bin/cli.js"
-  },
   "scripts": {
-    "test": "tap test/*.js"
+    "test": "export NODE_TEST=1 ; tap --tap test/*.js"
   },
   "repository": {
     "type": "git",
@@ -26,19 +23,21 @@
     "upload",
     "copy",
     "files",
-    "commit",
-    "S3"
+    "s3",
+    "cloudfront",
+    "amazon",
+    "deploy"
   ],
   "dependencies": {
-    "showf": "",
-    "knox": "0.8.x"
+    "knox": "0.8.x",
+    "mime": "1.2.x", 
+    "mkdirp": "0.5.x",
+    "rimraf": "2.2.x"
   },
   "devDependencies": {
-    "event-stream": "3.0.x",
-    "tap": "0.4.x",
-    "rimraf": "2.0.x"
+    "tap": "0.4.x"
   },
   "engines": {
-    "node": "0.10.x"
+    "node": ">= 0.10"
   }
 }
