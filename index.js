@@ -3,12 +3,23 @@
 
 module.exports = Pushup
 
+var assert = require('assert')
+  , fs = require('fs')
+  , knox = require('knox')
+  , mime = require('mime')
+  , mkdirp = require('mkdirp')
+  , path = require('path')
+  , rimraf = require('rimraf')
+  , stream = require('stream')
+  , string_decoder = require('string_decoder')
+  , util = require('util')
+  , zlib = require('zlib')
+  ;
+
 function TTL (data) {
   if (!(this instanceof TTL)) return new TTL(data)
   util._extend(this, data)
 }
-
-var path = require('path')
 
 TTL.prototype.age = function (fd) {
   return this[path.basename(fd)] || this[path.extname(fd)]
@@ -22,9 +33,6 @@ function conf (opts, env) {
   , region: opts.region || env.S3_REGION
   }
 }
-
-var util = require('util')
-  , stream = require('stream')
 
 function defaults (opts) {
   opts = opts || Object.create(null)
@@ -69,29 +77,22 @@ function Headers (size, type, ttl, enc) {
   if (!!enc) this['Content-Encoding'] = enc
 }
 
-var mime = require('mime')
-
 function type (fd) {
   var type = mime.lookup(fd)
     , charset = mime.charsets.lookup(type)
+    ;
   if (charset) {
     type += '; charset=' + charset;
   }
   return type
 }
 
-var fs = require('fs')
-  , assert = require('assert')
-
 function headers (unzipped, zipped, ttl, cb) {
   fs.stat(zipped || unzipped, function (er, stat) {
     if (er) return cb(er)
-    var t = type(unzipped)
-    cb(er, new Headers(stat.size, t, ttl, enc(zipped)))
+    cb(er, new Headers(stat.size, type(unzipped), ttl, enc(zipped)))
   })
 }
-
-var zlib = require('zlib')
 
 function gz (dir, file) {
   return path.join(dir, [path.basename(file), '.gz'].join(''))
@@ -105,31 +106,27 @@ function pipfin (streams) {
 
 function piperr (streams, cb) {
   function error (er) {
-    pipfin(streams)
     cb(er)
   }
   streams.forEach(function (stream) { stream.on('error', error) })
 }
 
-var mkdirp = require('mkdirp')
-
 function zip (dir, file, cb) {
   mkdirp(dir, function (er, made) {
     if (er) return cb(er)
     var z = gz(dir, file)
-    var read = fs.createReadStream(file)
+      , read = fs.createReadStream(file)
       , gzip = zlib.createGzip()
       , write = fs.createWriteStream(z)
-
-    var streams = [read, gzip, write]
+      , streams = [read, gzip, write]
+      ;
     piperr(streams, cb)
-
     read
      .pipe(gzip)
      .pipe(write)
      .on('finish', function () {
-        pipfin(streams)
         cb(er, z)
+        pipfin(streams)
       })
   })
 }
@@ -139,37 +136,32 @@ function remote (root, file) {
   return file
 }
 
-var knox = require('knox')
-
 Pushup.prototype.client = function () {
   if (!this._client) this._client = knox.createClient(this.knox)
   return this._client
-}
-
-var string_decoder = require('string_decoder')
-
-function decode (chunk) {
-  return new string_decoder.StringDecoder().write(chunk)
 }
 
 function local (root, file) {
   return path.join(root || '', file)
 }
 
-Pushup.prototype._transform = function (chunk, enc, cb) {
-  var unzipped = local(this.root, decode(chunk))
+Pushup.prototype.decode = function (chunk) {
+  this.decoder = (this.decoder || new string_decoder.StringDecoder())
+  return this.decoder.write(chunk)
+}
 
-  var client = this.client()
+Pushup.prototype._transform = function (chunk, enc, cb) {
+  var unzipped = local(this.root, this.decode(chunk))
+    , client = this.client()
     , target = remote(this.root, unzipped)
     , me = this
-
+    ;
   function upload (file, headers) {
     var read = fs.createReadStream(file)
       , put = client.put(target, headers)
-
-    var streams = [read, put]
+      , streams = [read, put]
+      ;
     piperr(streams, cb)
-
     read.pipe(put)
       .on('finish', function () {
         me.push(['pushed: ', target, '\n'].join(''))
@@ -195,8 +187,6 @@ Pushup.prototype._transform = function (chunk, enc, cb) {
     go(unzipped)
   }
 }
-
-var rimraf = require('rimraf')
 
 Pushup.prototype._flush = function (cb) {
   rimraf(this.tmp, function (er) {

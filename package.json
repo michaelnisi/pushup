@@ -1,6 +1,6 @@
 {
   "name": "pushup",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "main": "index.js",
   "scripts": {
     "test": "export NODE_TEST=1 ; tap --tap test/*.js"
@@ -29,7 +29,7 @@
     "deploy"
   ],
   "dependencies": {
-    "knox": "0.8.x",
+    "knox": "0.9.x",
     "mime": "1.2.x", 
     "mkdirp": "0.5.x",
     "rimraf": "2.2.x"
