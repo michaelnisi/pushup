@@ -209,18 +209,20 @@ test('conf', function (t) {
   , AWS_SECRET_ACCESS_KEY: 'b'
   , S3_BUCKET: 'c'
   , S3_REGION: 'd'
+  , S3_ENDPOINT: 'e'
   }
-  function opts (key, secret, bucket, region) {
+  function opts (key, secret, bucket, region, endpoint) {
     return {
       key: key
     , secret: secret
     , bucket: bucket
     , region: region
+    , endpoint: endpoint
     }
   }
-  t.deepEqual(f({}, env), opts('a', 'b', 'c', 'd'))
+  t.deepEqual(f({}, env), opts('a', 'b', 'c', 'd', 'e'))
   t.deepEqual(f(opts('a', 'b', 'c', 'd')), opts('a', 'b', 'c', 'd'))
-  t.deepEqual(f({key:'aa', secret:'bb'}, env), opts('aa', 'bb', 'c', 'd'))
+  t.deepEqual(f({key:'aa', secret:'bb'}, env), opts('aa', 'bb', 'c', 'd', 'e'))
   t.end()
 })
 

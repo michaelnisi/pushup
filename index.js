@@ -31,6 +31,7 @@ function conf (opts, env) {
   , secret: opts.secret || env.AWS_SECRET_ACCESS_KEY
   , bucket: opts.bucket || env.S3_BUCKET
   , region: opts.region || env.S3_REGION
+  , endpoint: opts.endpoint || (env ? env.S3_ENDPOINT : undefined)
   }
 }
 
@@ -145,29 +146,41 @@ function local (root, file) {
   return path.join(root || '', file)
 }
 
-Pushup.prototype.decode = function (chunk) {
-  this.decoder = (this.decoder || new string_decoder.StringDecoder())
-  return this.decoder.write(chunk)
-}
-
 Pushup.prototype._transform = function (chunk, enc, cb) {
-  var unzipped = local(this.root, this.decode(chunk))
+  var dec = new string_decoder.StringDecoder()
+    , unzipped = local(this.root, dec.write(chunk))
     , client = this.client()
     , target = remote(this.root, unzipped)
     , me = this
     ;
   function upload (file, headers) {
     var read = fs.createReadStream(file)
-      , put = client.put(target, headers)
-      , streams = [read, put]
-      ;
-    piperr(streams, cb)
-    read.pipe(put)
-      .on('finish', function () {
+    // TODO: How does knox handle errors in read?
+    client.putStream(read, target, headers, function (er, res) {
+      if (!!er) {
+        cb(er)
+      } if (res.statusCode !== 200) {
+        var chunks = []
+        res.on('readable', function () {
+          var chunk
+          while (null !== (chunk = res.read())) {
+            chunks.push(chunk)
+          }
+        })
+        res.on('end', function () {
+          var dec = new string_decoder.StringDecoder()
+            , body = new Buffer(chunks.join())
+            , er = new Error('AWS replied: ' + res.statusCode)
+            ;
+          er.description = dec.write(body)
+          cb(er)
+        })
+        res.resume()
+      } else {
         me.push(['pushed: ', target, '\n'].join(''))
-        pipfin(streams)
         cb()
-      })
+      }
+    })
   }
   function age (file) {
     return me.ttl.age(file)
