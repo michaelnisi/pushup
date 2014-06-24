@@ -159,9 +159,10 @@ Pushup.prototype._transform = function (chunk, enc, cb) {
     client.putStream(read, target, headers, function (er, res) {
       if (!!er) {
         cb(er)
-      } if (res.statusCode !== 200) {
+      } else if (res.statusCode !== 200) {
         var chunks = []
         res.on('readable', function () {
+          // TODO: Extract AWS response parser module
           var chunk
           while (null !== (chunk = res.read())) {
             chunks.push(chunk)
@@ -170,14 +171,14 @@ Pushup.prototype._transform = function (chunk, enc, cb) {
         res.on('end', function () {
           var dec = new string_decoder.StringDecoder()
             , body = new Buffer(chunks.join())
-            , er = new Error('AWS replied: ' + res.statusCode)
+            , er = new Error('AWS replied ' + res.statusCode)
             ;
           er.description = dec.write(body)
           cb(er)
         })
         res.resume()
       } else {
-        me.push(['pushed: ', target, '\n'].join(''))
+        me.push('pushed: ' + target + '\n')
         cb()
       }
     })
