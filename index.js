@@ -133,13 +133,11 @@ function zip (dir, file, cb) {
 }
 
 function remote (root, file) {
-  if (!!root && !!file) return path.normalize(file.split(root)[1])
-  return file
+  return !!root && !!file ? path.normalize(file.split(root)[1]) : file
 }
 
 Pushup.prototype.client = function () {
-  if (!this._client) this._client = knox.createClient(this.knox)
-  return this._client
+  return this._client || (this._client = knox.createClient(this.knox))
 }
 
 function local (root, file) {
@@ -162,7 +160,6 @@ Pushup.prototype._transform = function (chunk, enc, cb) {
       } else if (res.statusCode !== 200) {
         var chunks = []
         res.on('readable', function () {
-          // TODO: Extract AWS response parser module
           var chunk
           while (null !== (chunk = res.read())) {
             chunks.push(chunk)
