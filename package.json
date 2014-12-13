@@ -1,6 +1,6 @@
 {
   "name": "pushup",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "main": "index.js",
   "scripts": {
     "test": "export NODE_TEST=1 ; tap --tap test/*.js"
@@ -12,11 +12,7 @@
   "bugs": {
     "url": "https://github.com/michaelnisi/pushup/issues"
   },
-  "author": {
-    "name": "Michael Nisi",
-    "email": "michael.nisi@gmail.com",
-    "url": "http://michaelnisi.com"
-  },
+  "author": "Michael Nisi <michael.nisi@gmail.com> (http://michaelnisi.com)",
   "license": "MIT",
   "description": "copy files to S3",
   "keywords": [
@@ -29,15 +25,19 @@
     "deploy"
   ],
   "dependencies": {
-    "knox": "0.9.x",
-    "mime": "1.2.x", 
-    "mkdirp": "0.5.x",
-    "rimraf": "2.2.x"
+    "knox": "^0.9.1",
+    "mime": "^1.2.11",
+    "mkdirp": "^0.5.0",
+    "rimraf": "^2.2.8"
   },
   "devDependencies": {
-    "tap": "0.4.x"
+    "tap": "^0.4.13"
   },
   "engines": {
     "node": ">= 0.10"
+  },
+  "homepage": "https://github.com/michaelnisi/pushup",
+  "directories": {
+    "test": "test"
   }
 }

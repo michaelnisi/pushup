@@ -1,7 +1,7 @@
 
 # pushup - copy files to S3
 
-[![Build Status](https://secure.travis-ci.org/michaelnisi/pushup.svg)](http://travis-ci.org/michaelnisi/pushup) [![David DM](https://david-dm.org/michaelnisi/pushup.svg)](http://david-dm.org/michaelnisi/pushup)
+[![Build Status](https://secure.travis-ci.org/michaelnisi/pushup.svg)](http://travis-ci.org/michaelnisi/pushup)
 
 The **pushup** [Node](http://nodejs.org/) module copies local files to an [Amazon S3](http://aws.amazon.com/s3/) bucket. It is designed to deploy static websites hosted on S3 providing some configuration to harness [Amazon CloudFront](https://aws.amazon.com/cloudfront/) content delivery web service.
 
@@ -18,7 +18,7 @@ push.write('/some/other/file')
 push.end()
 ```
 
-Options let you control compression, caching, and the root of the path in the bucket. 
+Options let you control compression, caching, and the root of the path in the bucket.
 
 ```js
 function ttl() {
@@ -83,7 +83,11 @@ A Transform stream that consumes filenames and emits paths of files copied to S3
 
 ## Installation
 
-[![NPM](https://nodei.co/npm/pushup.svg)](https://npmjs.org/package/pushup)
+With [npm](https://www.npmjs.com/package/pushup) do:
+
+```
+$ npm install pushup
+```
 
 ## License
 
