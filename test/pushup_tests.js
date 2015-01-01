@@ -2,6 +2,7 @@
 var test = require('tap').test
   , fs = require('fs')
   , dir = '/tmp/pushup-' + Math.floor(Math.random() * (1<<24))
+  ;
 
 test('setup', function (t) {
   fs.mkdirSync(dir, 0700)
@@ -20,7 +21,8 @@ test('opts', function (t) {
   , { key:'a' }
   , { key:'a', secret:'b' }
   ].forEach(function (opts) {
-    t.throws(function () { f(opts).write('abc') })
+    t.throws(function () { f(opts).write('abc') },
+      'should throw if environment is not set and opts are incomplete')
   })
   t.end()
 })
@@ -74,12 +76,12 @@ test('gz', function (t) {
   // TODO: We have to retain paths for S3
 })
 
-test('TTL', function (t) {
-  var f = pushup.TTL
+test('Opts', function (t) {
+  var f = pushup.Opts
   t.plan(3)
-  t.is(f().age('index.html'), undefined)
-  t.is(f({'.html':3600}).age('index.html'), 3600)
-  t.is(f({'.html':3600, 'index.html':7200}).age('index.html'), 7200)
+  t.is(f().value('index.html'), undefined)
+  t.is(f({'.html':3600}).value('index.html'), 3600)
+  t.is(f({'.html':3600, 'index.html':7200}).value('index.html'), 7200)
   t.end()
 })
 
@@ -94,8 +96,8 @@ function write(name, data) {
 test('headers', function (t) {
   t.plan(2)
   var f = pushup.headers
-    , unzipped = write('hello.js', 'console.log("hello\n")')
-    , zipped = undefined
+  var unzipped = write('hello.js', 'console.log("hello\n")')
+  var zipped = undefined
   f(unzipped, zipped, 3600, function (er, headers) {
     t.ok(!er)
     var wanted = {
@@ -189,13 +191,12 @@ test('zippable', function (t) {
 })
 
 test('defaults', function (t) {
-  t.plan(6)
+  t.plan(5)
   var f = pushup.defaults
   t.ok(!!f())
-  t.is(f().gzip, false)
+  t.ok(!!f().gzip)
   t.ok(!!f().ttl)
   t.ok(!!f({}))
-  t.is(f({gzip:true}).gzip, true)
   t.ok(!!f({}).ttl)
   t.end()
 })

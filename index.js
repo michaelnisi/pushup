@@ -16,12 +16,12 @@ var assert = require('assert')
   , zlib = require('zlib')
   ;
 
-function TTL (data) {
-  if (!(this instanceof TTL)) return new TTL(data)
+function Opts (data) {
+  if (!(this instanceof Opts)) return new Opts(data)
   util._extend(this, data)
 }
 
-TTL.prototype.age = function (fd) {
+Opts.prototype.value = function (fd) {
   return this[path.basename(fd)] || this[path.extname(fd)]
 }
 
@@ -37,7 +37,7 @@ function conf (opts, env) {
 
 function defaults (opts) {
   opts = opts || Object.create(null)
-  opts.gzip = opts.gzip || false
+  opts.gzip = opts.gzip || Object.create(null)
   opts.ttl = opts.ttl || Object.create(null)
   opts.root = opts.root || undefined
   opts.tmp = opts.tmp || '/tmp/pushup'
@@ -49,8 +49,8 @@ function Pushup (opts) {
   opts = defaults(opts)
   stream.Transform.call(this, opts)
   this.knox = conf(opts, process.env)
-  this.ttl = new TTL(opts.ttl)
-  this.gzip = opts.gzip
+  this.ttl = new Opts(opts.ttl)
+  this.gzip = new Opts(opts.gzip)
   this.root = opts.root
   this.tmp = opts.tmp
 }
@@ -116,11 +116,10 @@ function zip (dir, file, cb) {
   mkdirp(dir, function (er, made) {
     if (er) return cb(er)
     var z = gz(dir, file)
-      , read = fs.createReadStream(file)
-      , gzip = zlib.createGzip()
-      , write = fs.createWriteStream(z)
-      , streams = [read, gzip, write]
-      ;
+    var read = fs.createReadStream(file)
+    var gzip = zlib.createGzip()
+    var write = fs.createWriteStream(z)
+    var streams = [read, gzip, write]
     piperr(streams, cb)
     read
      .pipe(gzip)
@@ -181,7 +180,7 @@ Pushup.prototype._transform = function (chunk, enc, cb) {
     })
   }
   function age (file) {
-    return me.ttl.age(file)
+    return me.ttl.value(file)
   }
   function go (unzipped, zipped) {
     headers(unzipped, zipped, age(unzipped), function (er, headers) {
@@ -189,7 +188,10 @@ Pushup.prototype._transform = function (chunk, enc, cb) {
       upload(zipped || unzipped, headers)
     })
   }
-  if (this.gzip && zippable(unzipped)) {
+  function gzip (file) {
+    return me.gzip.value(file) !== false
+  }
+  if (gzip(unzipped) && zippable(unzipped)) {
     zip(this.tmp, unzipped, function (er, zipped) {
       if (er) return cb(er)
       go(unzipped, zipped)
@@ -207,7 +209,7 @@ Pushup.prototype._flush = function (cb) {
 
 if (process.env.NODE_TEST) {
   ;[Headers
-  , TTL
+  , Opts
   , conf
   , defaults
   , enc
