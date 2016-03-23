@@ -1,20 +1,17 @@
-
 // pushup - copy files to S3
 
 module.exports = Pushup
 
-var assert = require('assert')
-  , fs = require('fs')
-  , knox = require('knox')
-  , mime = require('mime')
-  , mkdirp = require('mkdirp')
-  , path = require('path')
-  , rimraf = require('rimraf')
-  , stream = require('stream')
-  , string_decoder = require('string_decoder')
-  , util = require('util')
-  , zlib = require('zlib')
-  ;
+var fs = require('fs')
+var knox = require('knox')
+var mime = require('mime')
+var mkdirp = require('mkdirp')
+var path = require('path')
+var rimraf = require('rimraf')
+var stream = require('readable-stream')
+var string_decoder = require('string_decoder')
+var util = require('util')
+var zlib = require('zlib')
 
 function Opts (data) {
   if (!(this instanceof Opts)) return new Opts(data)
@@ -27,11 +24,11 @@ Opts.prototype.value = function (fd) {
 
 function conf (opts, env) {
   return {
-    key: opts.key || env.AWS_ACCESS_KEY_ID
-  , secret: opts.secret || env.AWS_SECRET_ACCESS_KEY
-  , bucket: opts.bucket || env.S3_BUCKET
-  , region: opts.region || env.S3_REGION
-  , endpoint: opts.endpoint || (env ? env.S3_ENDPOINT : undefined)
+    key: opts.key || env.AWS_ACCESS_KEY_ID,
+    secret: opts.secret || env.AWS_SECRET_ACCESS_KEY,
+    bucket: opts.bucket || env.S3_BUCKET,
+    region: opts.region || env.S3_REGION,
+    endpoint: opts.endpoint || env ? env.S3_ENDPOINT : undefined
   }
 }
 
@@ -72,24 +69,23 @@ function enc (fd) {
 // - enc the modifier to the media-type
 function Headers (size, type, ttl, enc) {
   if (!(this instanceof Headers)) return new Headers(size, type, ttl, enc)
-  if (!!size) this['Content-Length'] = size
-  if (!!type) this['Content-Type'] = type
+  if (size) this['Content-Length'] = size
+  if (type) this['Content-Type'] = type
   if (!isNaN(ttl)) this['Cache-Control'] = 'max-age=' + ttl
-  if (!!enc) this['Content-Encoding'] = enc
+  if (enc) this['Content-Encoding'] = enc
 }
 
 function type (fd) {
   var type = mime.lookup(fd)
-    , charset = mime.charsets.lookup(type)
-    ;
-  if (charset) {
-    type += '; charset=' + charset;
+  var charset = mime.charsets.lookup(type)
+  if (typeof charset === 'string') {
+    type += '; charset=' + charset
   }
   return type
 }
 
 function headers (unzipped, zipped, ttl, cb) {
-  fs.stat(zipped || unzipped, function (er, stat) {
+  fs.stat(zipped || unzipped, function (er, stat) {
     if (er) return cb(er)
     cb(er, new Headers(stat.size, type(unzipped), ttl, enc(zipped)))
   })
@@ -121,13 +117,10 @@ function zip (dir, file, cb) {
     var write = fs.createWriteStream(z)
     var streams = [read, gzip, write]
     piperr(streams, cb)
-    read
-     .pipe(gzip)
-     .pipe(write)
-     .on('finish', function () {
-        cb(er, z)
-        pipfin(streams)
-      })
+    read.pipe(gzip).pipe(write).on('finish', function () {
+      cb(er, z)
+      pipfin(streams)
+    })
   })
 }
 
@@ -145,30 +138,30 @@ function local (root, file) {
 
 Pushup.prototype._transform = function (chunk, enc, cb) {
   var dec = new string_decoder.StringDecoder()
-    , unzipped = local(this.root, dec.write(chunk))
-    , client = this.client()
-    , target = remote(this.root, unzipped)
-    , me = this
-    ;
+  var unzipped = local(this.root, dec.write(chunk))
+  var client = this.client()
+  var target = remote(this.root, unzipped)
+  var me = this
+
   function upload (file, headers) {
     var read = fs.createReadStream(file)
     // TODO: How does knox handle errors in read?
     client.putStream(read, target, headers, function (er, res) {
-      if (!!er) {
+      if (er instanceof Error) {
         cb(er)
       } else if (res.statusCode !== 200) {
         var chunks = []
         res.on('readable', function () {
           var chunk
-          while (null !== (chunk = res.read())) {
+          while ((chunk = res.read()) !== null) {
             chunks.push(chunk)
           }
         })
         res.on('end', function () {
           var dec = new string_decoder.StringDecoder()
-            , body = new Buffer(chunks.join())
-            , er = new Error('AWS replied ' + res.statusCode)
-            ;
+          var body = new Buffer(chunks.join())
+          var er = new Error('AWS replied ' + res.statusCode)
+
           er.description = dec.write(body)
           cb(er)
         })
@@ -208,14 +201,14 @@ Pushup.prototype._flush = function (cb) {
 }
 
 if (process.env.NODE_TEST) {
-  ;[Headers
-  , Opts
-  , conf
-  , defaults
-  , enc
-  , gz
-  , headers
-  , remote
-  , type
-  , zippable].forEach(function (f) { module.exports[f.name] = f })
+  module.exports.Headers = Headers
+  module.exports.Opts = Opts
+  module.exports.conf = conf
+  module.exports.defaults = defaults
+  module.exports.enc = enc
+  module.exports. gz = gz
+  module.exports.headers = headers
+  module.exports.remote = remote
+  module.exports.type = type
+  module.exports.zippable = zippable
 }
