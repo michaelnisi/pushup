@@ -46,7 +46,7 @@ push.end()
 
 ## Types
 
-### gzip
+### gzip()
 
 An optional bag of settings to toggle gzip compression by filename or extension as `Boolean()` (defaults to `true`). **pushup** compresses text files using gzip and sets proper `content/encoding` headers. The following would compress all but XML files:
 
@@ -54,7 +54,7 @@ An optional bag of settings to toggle gzip compression by filename or extension 
 { '.xml': false }
 ```
 
-### ttl
+### ttl()
 
 Optional settings to configure `Cache-Control` [headers](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html) by filename or extension in (max-age) delta-seconds. For example:
 
@@ -62,7 +62,7 @@ Optional settings to configure `Cache-Control` [headers](http://www.w3.org/Proto
 { '.html': 3600 * 24 * 30, '.css': 3600 * 24 * 30, 'hot.html': 3600 }
 ```
 
-### root
+### root()
 
 With the `root` option you can control the root of the replicated file tree in your bucket. For example:
 
@@ -77,13 +77,13 @@ push.end()
 
 This would copy the files to `/file` and `/other/file` in your S3 bucket. If `root` is `undefined` or your defined `root` is not part of the given file path, the entire path will be replicated.
 
-### opts
+### opts()
 
 An optional configuration `Object` passed to the `Transform` stream constructor.
 
-- `gzip` [gzip](#gzip)
-- `ttl` [ttl](#ttl)
-- `root` [root](#root)
+- `gzip` [gzip()](#gzip)
+- `ttl` [ttl()](#ttl)
+- `root` [root()](#root)
 - `tmp` `String()` defaults to `'/tmp/pushup'`
 - `key` `String()` defaults to `process.env.AWS_ACCESS_KEY_ID`
 - `secret` `String()` defaults to `process.env.AWS_SECRET_ACCESS_KEY`
@@ -92,7 +92,7 @@ An optional configuration `Object` passed to the `Transform` stream constructor.
 
 ## Exports
 
-### pushup(opts)
+### pushup(opts())
 
 A Transform stream that consumes filenames and emits paths of files copied to S3 using [knox](https://github.com/LearnBoost/knox).
 
