@@ -3,7 +3,7 @@
 module.exports = Pushup
 
 var fs = require('fs')
-var knox = require('knox')
+var AWS = require('aws-sdk')
 var mime = require('mime')
 var mkdirp = require('mkdirp')
 var path = require('path')
@@ -45,7 +45,7 @@ function Pushup (opts) {
   if (!(this instanceof Pushup)) return new Pushup(opts)
   opts = defaults(opts)
   stream.Transform.call(this, opts)
-  this.knox = conf(opts, process.env)
+  this.conf = conf(opts, process.env)
   this.ttl = new Opts(opts.ttl)
   this.gzip = new Opts(opts.gzip)
   this.root = opts.root
@@ -129,7 +129,11 @@ function remote (root, file) {
 }
 
 Pushup.prototype.client = function () {
-  return this._client || (this._client = knox.createClient(this.knox))
+  if (!this._client) {
+    AWS.config.update({region: this.conf.region })
+    this._client = new AWS.S3()
+  }
+  return this._client
 }
 
 function local (root, file) {
@@ -137,37 +141,24 @@ function local (root, file) {
 }
 
 Pushup.prototype._transform = function (chunk, enc, cb) {
-  var dec = new string_decoder.StringDecoder()
-  var unzipped = local(this.root, dec.write(chunk))
+  var bucket = this.conf.bucket
   var client = this.client()
-  var target = remote(this.root, unzipped)
+  var dec = new string_decoder.StringDecoder()
   var me = this
+  var unzipped = local(this.root, dec.write(chunk))
+  var key = remote(this.root, unzipped)
 
   function upload (file, headers) {
-    var read = fs.createReadStream(file)
-    // TODO: How does knox handle errors in read?
-    client.putStream(read, target, headers, function (er, res) {
+    var params = {
+      Bucket: bucket,
+      Key: key,
+      Body: fs.createReadStream(file)
+    }
+    client.putObject(params, function (er, data) {
       if (er instanceof Error) {
         cb(er)
-      } else if (res.statusCode !== 200) {
-        var chunks = []
-        res.on('readable', function () {
-          var chunk
-          while ((chunk = res.read()) !== null) {
-            chunks.push(chunk)
-          }
-        })
-        res.on('end', function () {
-          var dec = new string_decoder.StringDecoder()
-          var body = new Buffer(chunks.join())
-          var er = new Error('AWS replied ' + res.statusCode)
-
-          er.description = dec.write(body)
-          cb(er)
-        })
-        res.resume()
       } else {
-        me.push('pushed: ' + target + '\n')
+        me.push(key)
         cb()
       }
     })
