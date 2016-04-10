@@ -79,26 +79,29 @@ This would copy the files to `/file` and `/other/file` in your S3 bucket. If `ro
 
 ### opts()
 
-An optional configuration `Object` passed to the `Transform` stream constructor.
+A configuration `Object` passed to the `Transform` stream constructor.
+
+Required properties:
+
+- `bucket` `String()` The S3 bucket name to copy files to.
+- `region` `String()` The AWS region—defaults to `process.env.AWS_REGION`.
+
+Optional properties:
 
 - `gzip` [gzip()](#gzip)
-- `ttl` [ttl()](#ttl)
 - `root` [root()](#root)
 - `tmp` `String()` defaults to `'/tmp/pushup'`
-- `key` `String()` defaults to `process.env.AWS_ACCESS_KEY_ID`
-- `secret` `String()` defaults to `process.env.AWS_SECRET_ACCESS_KEY`
-- `bucket` `String()` defaults to `process.env.S3_BUCKET`
-- `region` `String()` defaults to `process.env.S3_REGION`
+- `ttl` [ttl()](#ttl)
 
 ## Exports
 
 ### pushup(opts())
 
-A Transform stream that consumes filenames and emits paths of files copied to S3 using [knox](https://github.com/LearnBoost/knox).
+A Transform stream that consumes filenames and emits paths of files copied to a S3.
 
 ## Installation
 
-With [npm](https://www.npmjs.com/package/pushup) do:
+With [npm](https://www.npmjs.com/package/pushup), do:
 
 ```
 $ npm install pushup

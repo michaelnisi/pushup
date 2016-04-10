@@ -2,10 +2,11 @@
 
 module.exports = Pushup
 
-var fs = require('fs')
 var AWS = require('aws-sdk')
+var fs = require('fs')
 var mime = require('mime')
 var mkdirp = require('mkdirp')
+var os = require('os')
 var path = require('path')
 var rimraf = require('rimraf')
 var stream = require('readable-stream')
@@ -22,22 +23,13 @@ Opts.prototype.value = function (fd) {
   return this[path.basename(fd)] || this[path.extname(fd)]
 }
 
-function conf (opts, env) {
-  return {
-    key: opts.key || env.AWS_ACCESS_KEY_ID,
-    secret: opts.secret || env.AWS_SECRET_ACCESS_KEY,
-    bucket: opts.bucket || env.S3_BUCKET,
-    region: opts.region || env.S3_REGION,
-    endpoint: opts.endpoint || env ? env.S3_ENDPOINT : undefined
-  }
-}
-
 function defaults (opts) {
   opts = opts || Object.create(null)
   opts.gzip = opts.gzip || Object.create(null)
-  opts.ttl = opts.ttl || Object.create(null)
+  opts.region = opts.region || undefined
   opts.root = opts.root || undefined
-  opts.tmp = opts.tmp || '/tmp/pushup'
+  opts.tmp = opts.tmp || os.tmpdir()
+  opts.ttl = opts.ttl || Object.create(null)
   return opts
 }
 
@@ -45,11 +37,17 @@ function Pushup (opts) {
   if (!(this instanceof Pushup)) return new Pushup(opts)
   opts = defaults(opts)
   stream.Transform.call(this, opts)
-  this.conf = conf(opts, process.env)
-  this.ttl = new Opts(opts.ttl)
-  this.gzip = new Opts(opts.gzip)
+
+  AWS.config.region = opts.region
+
+  this.bucket = opts.bucket
   this.root = opts.root
   this.tmp = opts.tmp
+
+  this.ttl = new Opts(opts.ttl)
+  this.gzip = new Opts(opts.gzip)
+
+  this.decoder = new string_decoder.StringDecoder()
 }
 util.inherits(Pushup, stream.Transform)
 
@@ -129,10 +127,7 @@ function remote (root, file) {
 }
 
 Pushup.prototype.client = function () {
-  if (!this._client) {
-    AWS.config.update({region: this.conf.region })
-    this._client = new AWS.S3()
-  }
+  if (!this._client) this._client = new AWS.S3()
   return this._client
 }
 
@@ -141,11 +136,11 @@ function local (root, file) {
 }
 
 Pushup.prototype._transform = function (chunk, enc, cb) {
-  var bucket = this.conf.bucket
+  var bucket = this.bucket
   var client = this.client()
-  var dec = new string_decoder.StringDecoder()
   var me = this
-  var unzipped = local(this.root, dec.write(chunk))
+
+  var unzipped = local(this.root, this.decoder.write(chunk))
   var key = remote(this.root, unzipped)
 
   function upload (file, headers) {
@@ -186,6 +181,11 @@ Pushup.prototype._transform = function (chunk, enc, cb) {
 }
 
 Pushup.prototype._flush = function (cb) {
+  this._client = null
+  this.decoder.end()
+  this.decoder = null
+  this.ttl = null
+  this.gzip = null
   rimraf(this.tmp, function (er) {
     cb(er)
   })
@@ -194,7 +194,6 @@ Pushup.prototype._flush = function (cb) {
 if (process.env.NODE_TEST) {
   module.exports.Headers = Headers
   module.exports.Opts = Opts
-  module.exports.conf = conf
   module.exports.defaults = defaults
   module.exports.enc = enc
   module.exports. gz = gz
