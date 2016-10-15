@@ -1,6 +1,6 @@
 # pushup - copy files to S3
 
-The **pushup** [Node](http://nodejs.org/) module copies local files to an [Amazon S3](http://aws.amazon.com/s3/) bucket. It is designed to deploy file trees to S3 supporting gzip compression and the Cache-Control header.
+The **pushup** [Node](http://nodejs.org/) package gives you a writable stream of [S3](http://aws.amazon.com/s3/) uploads. Its purpose is to copy file trees to S3 with optional [gzip](http://www.gzip.org/) compression and `Cache-Control` header configuration.
 
 [![Build Status](https://secure.travis-ci.org/michaelnisi/pushup.svg)](http://travis-ci.org/michaelnisi/pushup)
 
@@ -11,10 +11,9 @@ The **pushup** [Node](http://nodejs.org/) module copies local files to an [Amazo
 ```js
 var pushup = require('pushup')
 
-var push = pushup()
-push.write('/some/file')
-push.write('/some/other/file')
-push.end()
+var p = pushup('my.aws.bucket')
+p.write('/some/file')
+p.end('/some/other/file')
 ```
 
 Options let you control compression, caching, and the root of the path in the bucket.
@@ -81,13 +80,7 @@ This would copy the files to `/file` and `/other/file` in your S3 bucket. If `ro
 
 A configuration `Object` passed to the `Transform` stream constructor.
 
-Required properties:
-
-- `bucket` `String()` The S3 bucket name to copy files to.
 - `region` `String()` The AWS region—defaults to `process.env.AWS_REGION`.
-
-Optional properties:
-
 - `gzip` [gzip()](#gzip)
 - `root` [root()](#root)
 - `tmp` `String()` defaults to `'/tmp/pushup'`
@@ -95,7 +88,10 @@ Optional properties:
 
 ## Exports
 
-### pushup(opts())
+### pushup(bucket, opts)
+
+- `bucket` `String()` The name of the bucket.
+- `opts` [opts()](#opts) | undefined | null Some optional settings.
 
 A Transform stream that consumes filenames and emits paths of files copied to a S3.
 

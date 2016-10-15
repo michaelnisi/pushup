@@ -2,18 +2,20 @@
 
 module.exports = Pushup
 
-var AWS = require('aws-sdk')
-var fs = require('fs')
-var mime = require('mime')
-var mkdirp = require('mkdirp')
-var os = require('os')
-var path = require('path')
-var rimraf = require('rimraf')
-var stream = require('readable-stream')
-var string_decoder = require('string_decoder')
-var util = require('util')
-var zlib = require('zlib')
+const assert = require('assert')
+const AWS = require('aws-sdk')
+const fs = require('fs')
+const mime = require('mime')
+const mkdirp = require('mkdirp')
+const os = require('os')
+const path = require('path')
+const rimraf = require('rimraf')
+const stream = require('readable-stream')
+const string_decoder = require('string_decoder')
+const util = require('util')
+const zlib = require('zlib')
 
+// TODO: Rename to something more expressive
 function Opts (data) {
   if (!(this instanceof Opts)) return new Opts(data)
   util._extend(this, data)
@@ -24,23 +26,24 @@ Opts.prototype.value = function (fd) {
 }
 
 function defaults (opts) {
-  opts = opts || Object.create(null)
-  opts.gzip = opts.gzip || Object.create(null)
-  opts.region = opts.region || undefined
-  opts.root = opts.root || undefined
-  opts.tmp = opts.tmp || os.tmpdir()
-  opts.ttl = opts.ttl || Object.create(null)
-  return opts
+  var o = Object.create(null)
+  o.gzip = opts.gzip || Object.create(null)
+  o.region = opts.region || undefined
+  o.root = opts.root || undefined
+  o.tmp = opts.tmp || os.tmpdir()
+  o.ttl = opts.ttl || Object.create(null)
+  return o
 }
 
-function Pushup (opts) {
-  if (!(this instanceof Pushup)) return new Pushup(opts)
+function Pushup (bucket, opts) {
+  if (!(this instanceof Pushup)) return new Pushup(bucket, opts)
+  assert(typeof bucket === 'string', 'bucket not set')
   opts = defaults(opts)
   stream.Transform.call(this, opts)
 
   AWS.config.region = opts.region
 
-  this.bucket = opts.bucket
+  this.bucket = bucket
   this.root = opts.root
   this.tmp = opts.tmp
 
@@ -138,10 +141,11 @@ function local (root, file) {
 Pushup.prototype._transform = function (chunk, enc, cb) {
   var bucket = this.bucket
   var client = this.client()
-  var me = this
 
   var unzipped = local(this.root, this.decoder.write(chunk))
   var key = remote(this.root, unzipped)
+
+  var me = this
 
   function upload (file, headers) {
     var params = {
