@@ -1,9 +1,12 @@
+'use strict'
+
 // pushup - copy files to S3
 
 module.exports = Pushup
 
-const assert = require('assert')
 const AWS = require('aws-sdk')
+const StringDecoder = require('string_decoder').StringDecoder
+const assert = require('assert')
 const fs = require('fs')
 const mime = require('mime')
 const mkdirp = require('mkdirp')
@@ -11,7 +14,6 @@ const os = require('os')
 const path = require('path')
 const rimraf = require('rimraf')
 const stream = require('readable-stream')
-const string_decoder = require('string_decoder')
 const util = require('util')
 const zlib = require('zlib')
 
@@ -26,7 +28,7 @@ Opts.prototype.value = function (fd) {
 }
 
 function defaults (opts) {
-  var o = Object.create(null)
+  const o = Object.create(null)
   o.gzip = opts.gzip || Object.create(null)
   o.region = opts.region || undefined
   o.root = opts.root || undefined
@@ -41,8 +43,6 @@ function Pushup (bucket, opts) {
   opts = defaults(opts)
   stream.Transform.call(this, opts)
 
-  AWS.config.region = opts.region
-
   this.bucket = bucket
   this.root = opts.root
   this.tmp = opts.tmp
@@ -50,14 +50,16 @@ function Pushup (bucket, opts) {
   this.ttl = new Opts(opts.ttl)
   this.gzip = new Opts(opts.gzip)
 
-  this.decoder = new string_decoder.StringDecoder()
+  this.decoder = new StringDecoder()
+
+  AWS.config.region = opts.region
 }
 util.inherits(Pushup, stream.Transform)
 
 var zExts = ['.html', '.js', '.css', '.xml', '.txt']
 function zippable (file) {
-  var extname = path.extname(file)
-  return zExts.some(function (ext) { return extname === ext })
+  const extname = path.extname(file)
+  return zExts.some((ext) => { return extname === ext })
 }
 
 function enc (fd) {
@@ -77,8 +79,8 @@ function Headers (size, type, ttl, enc) {
 }
 
 function type (fd) {
-  var type = mime.lookup(fd)
-  var charset = mime.charsets.lookup(type)
+  let type = mime.lookup(fd)
+  const charset = mime.charsets.lookup(type)
   if (typeof charset === 'string') {
     type += '; charset=' + charset
   }
@@ -86,8 +88,8 @@ function type (fd) {
 }
 
 function headers (unzipped, zipped, ttl, cb) {
-  var p = zipped || unzipped
-  fs.stat(p, function (er, stat) {
+  const p = zipped || unzipped
+  fs.stat(p, (er, stat) => {
     if (er) return cb(er)
     cb(er, new Headers(stat.size, type(unzipped), ttl, enc(p)))
   })
@@ -98,28 +100,24 @@ function gz (dir, file) {
 }
 
 function pipfin (streams) {
-  streams.forEach(function (stream) {
-    stream.removeAllListeners()
-  })
+  streams.forEach((stream) => { stream.removeAllListeners() })
 }
 
 function piperr (streams, cb) {
-  function error (er) {
-    cb(er)
-  }
-  streams.forEach(function (stream) { stream.on('error', error) })
+  function error (er) { cb(er) }
+  streams.forEach((stream) => { stream.on('error', error) })
 }
 
 function zip (dir, file, cb) {
   mkdirp(dir, function (er, made) {
     if (er) return cb(er)
-    var z = gz(dir, file)
-    var read = fs.createReadStream(file)
-    var gzip = zlib.createGzip()
-    var write = fs.createWriteStream(z)
-    var streams = [read, gzip, write]
+    const z = gz(dir, file)
+    const read = fs.createReadStream(file)
+    const gzip = zlib.createGzip()
+    const write = fs.createWriteStream(z)
+    const streams = [read, gzip, write]
     piperr(streams, cb)
-    read.pipe(gzip).pipe(write).on('finish', function () {
+    read.pipe(gzip).pipe(write).on('finish', () => {
       cb(er, z)
       pipfin(streams)
     })
@@ -140,34 +138,31 @@ function local (root, file) {
 }
 
 Pushup.prototype._transform = function (chunk, enc, cb) {
-  var bucket = this.bucket
-  var client = this.client()
+  const bucket = this.bucket
+  const client = this.client()
 
-  var unzipped = local(this.root, this.decoder.write(chunk))
-  var key = remote(this.root, unzipped)
+  const unzipped = local(this.root, this.decoder.write(chunk))
+  const key = remote(this.root, unzipped)
 
-  var me = this
+  const me = this
 
   function upload (file, headers) {
-    var params = {
+    const params = {
       Bucket: bucket,
       Key: key,
       Body: fs.createReadStream(file)
     }
-    client.putObject(params, function (er, data) {
-      if (er instanceof Error) {
-        cb(er)
-      } else {
-        me.push(key)
-        cb()
-      }
+    client.putObject(params, (er, data) => {
+      if (er instanceof Error) return cb(er)
+      me.push(key)
+      cb()
     })
   }
   function age (file) {
     return me.ttl.value(file)
   }
   function go (unzipped, zipped) {
-    headers(unzipped, zipped, age(unzipped), function (er, headers) {
+    headers(unzipped, zipped, age(unzipped), (er, headers) => {
       if (er) return cb(er)
       upload(zipped || unzipped, headers)
     })
@@ -176,7 +171,7 @@ Pushup.prototype._transform = function (chunk, enc, cb) {
     return me.gzip.value(file) !== false
   }
   if (gzip(unzipped) && zippable(unzipped)) {
-    zip(this.tmp, unzipped, function (er, zipped) {
+    zip(this.tmp, unzipped, (er, zipped) => {
       if (er) return cb(er)
       go(unzipped, zipped)
     })
@@ -191,9 +186,7 @@ Pushup.prototype._flush = function (cb) {
   this.decoder = null
   this.ttl = null
   this.gzip = null
-  rimraf(this.tmp, function (er) {
-    cb(er)
-  })
+  rimraf(this.tmp, (er) => { cb(er) })
 }
 
 if (process.env.NODE_TEST) {
@@ -201,7 +194,7 @@ if (process.env.NODE_TEST) {
   module.exports.Opts = Opts
   module.exports.defaults = defaults
   module.exports.enc = enc
-  module.exports. gz = gz
+  module.exports.gz = gz
   module.exports.headers = headers
   module.exports.remote = remote
   module.exports.type = type
