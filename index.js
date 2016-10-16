@@ -85,9 +85,10 @@ function type (fd) {
 }
 
 function headers (unzipped, zipped, ttl, cb) {
-  fs.stat(zipped || unzipped, function (er, stat) {
+  var p = zipped || unzipped
+  fs.stat(p, function (er, stat) {
     if (er) return cb(er)
-    cb(er, new Headers(stat.size, type(unzipped), ttl, enc(zipped)))
+    cb(er, new Headers(stat.size, type(unzipped), ttl, enc(p)))
   })
 }
 

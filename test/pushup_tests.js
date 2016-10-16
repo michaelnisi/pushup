@@ -110,17 +110,19 @@ test('headers', function (t) {
 })
 
 test('enc', function (t) {
-  t.plan(5)
   var f = pushup.enc
+
+  t.plan(5)
+
+  t.throws(function () { f() })
+
   var wanted = [
-    undefined,
     undefined,
     undefined,
     undefined,
     'gzip'
   ]
   ;[
-    f(),
     f(''),
     f('some.js'),
     f('/a/thing.css'),
@@ -128,7 +130,6 @@ test('enc', function (t) {
   ].forEach(function (found, i) {
     t.deepEqual(found, wanted[i])
   })
-  t.end()
 })
 
 test('type', function (t) {
