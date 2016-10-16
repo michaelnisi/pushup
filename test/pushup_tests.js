@@ -4,6 +4,7 @@ var dir = '/tmp/pushup-' + Math.floor(Math.random() * (1 << 24))
 var fs = require('fs')
 var path = require('path')
 var pushup = require('../')
+var semver = require('semver')
 var test = require('tap').test
 
 test('setup', function (t) {
@@ -110,17 +111,20 @@ test('headers', function (t) {
 })
 
 test('enc', function (t) {
-  t.plan(5)
   var f = pushup.enc
+
+  var v = process.versions.node
+  if (semver.satisfies(v, '>=6')) {
+    t.throws(function () { f() })
+  }
+
   var wanted = [
-    undefined,
     undefined,
     undefined,
     undefined,
     'gzip'
   ]
   ;[
-    f(),
     f(''),
     f('some.js'),
     f('/a/thing.css'),
@@ -128,6 +132,7 @@ test('enc', function (t) {
   ].forEach(function (found, i) {
     t.deepEqual(found, wanted[i])
   })
+
   t.end()
 })
 
