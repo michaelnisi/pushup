@@ -78,11 +78,11 @@ This would copy the files to `'/file'` and `'/other/file'` in your S3 bucket, us
 
 ### opts()
 
-Optional parameters you might want to use.
+Some optional parameters you might want to use.
 
-- `gzip` [gzip()](#gzip)
-- `root` [root()](#root)
-- `tmp` `String()` defaults to `'/tmp/pushup'`
+- `gzip` [gzip()](#gzip) | `undefined` | `null`
+- `root` [root()](#root) | `undefined` | `null`
+- `tmp` `String()` Directory to store temporary files. Defaults to `'os.tmpdir()/pushup'`.
 - `ttl` [ttl()](#ttl)
 - `encoding` `String()` Passed to `stream.Readable()`. Defaults to `'utf8'`.
 - `highWaterMark` `Number()` Passed directly to `stream.Readable()`.
@@ -95,7 +95,7 @@ Optional parameters you might want to use.
 - `bucket` `String()` The name of the bucket.
 - `key` `String()` Your AWS access key ID.
 - `secret` `String()` Your AWS secret access key.
-- `opts` [opts()](#opts) | `undefined` | `null` Some optional settings.
+- `opts` [opts()](#opts) | `undefined` | `null`
 
 A Transform stream that consumes filenames and emits paths of files copied to a S3.
 
