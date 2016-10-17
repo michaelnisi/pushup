@@ -1,38 +1,43 @@
+'use strict'
+
 // pushup_tests - test pushup module basics
 
-var dir = '/tmp/pushup-' + Math.floor(Math.random() * (1 << 24))
-var fs = require('fs')
-var path = require('path')
-var pushup = require('../')
-var semver = require('semver')
-var test = require('tap').test
+const dir = '/tmp/pushup-' + Math.floor(Math.random() * (1 << 24))
+const fs = require('fs')
+const path = require('path')
+const pushup = require('../')
+const semver = require('semver')
+const test = require('tap').test
 
-test('setup', function (t) {
+test('setup', (t) => {
   fs.mkdirSync(dir)
   t.plan(2)
   t.ok(process.env.NODE_TEST)
   t.ok(fs.statSync(dir).isDirectory())
-  t.end()
 })
 
-test('opts', function (t) {
-  var f = pushup
-  var opts = [
+test('opts', (t) => {
+  const f = pushup
+  const opts = [
     null,
     { key: 'a' },
     { key: 'a', secret: 'b' }
   ]
   t.plan(opts.length)
-  opts.forEach(function (o) {
-    t.throws(function () { f(o).write('abc') },
-      'should throw if environment is not set and opts are incomplete')
+  opts.forEach((o) => {
+    t.throws(() => { f(o).write('abc') })
   })
 })
 
-test('ENOENT', function (t) {
+test('init', (t) => {
+  t.throws(() => pushup())
+  t.end()
+})
+
+test('ENOENT', (t) => {
   t.plan(2)
   var f = pushup
-  f({ key: 'a', secret: 'b', bucket: 'abc' })
+  f('abc', { key: 'a', secret: 'b' })
     .on('error', function (er) {
       t.ok(er instanceof Error)
       t.is(er.code, 'ENOENT')
@@ -78,8 +83,8 @@ test('gz', function (t) {
   // TODO: We have to retain paths for S3
 })
 
-test('Opts', function (t) {
-  var f = pushup.Opts
+test('MetaData', function (t) {
+  var f = pushup.MetaData
   t.plan(3)
   t.is(f().value('index.html'), undefined)
   t.is(f({'.html': 3600}).value('index.html'), 3600)
@@ -194,20 +199,22 @@ test('zippable', function (t) {
   t.end()
 })
 
-test('defaults', function (t) {
-  t.plan(5)
+test('defaults', (t) => {
   var f = pushup.defaults
-  t.ok(!!f())
-  t.ok(!!f().gzip)
-  t.ok(!!f().ttl)
-  t.ok(!!f({}))
-  t.ok(!!f({}).ttl)
+
+  t.plan(5)
+  t.ok(f())
+  t.ok(f().gzip)
+  t.ok(f().ttl)
+  t.ok(f({}))
+  t.ok(f({}).ttl)
+
   t.end()
 })
 
 test('conf', function (t) {
   t.plan(4)
-  var f = pushup.conf
+  var f = pushup.defaults
   t.throws(f)
   var env = {
     AWS_ACCESS_KEY_ID: 'a',

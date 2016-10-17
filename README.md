@@ -1,6 +1,6 @@
 # pushup - copy files to S3
 
-The **pushup** [Node](http://nodejs.org/) package gives you a writable stream of [S3](http://aws.amazon.com/s3/) uploads. Its purpose is to copy file trees to S3 with optional [gzip](http://www.gzip.org/) compression and `Cache-Control` header configuration.
+The **pushup** [Node.js](http://nodejs.org/) package copies local files to [S3](http://aws.amazon.com/s3/). Its API is a sole Transform stream, which lets you write filenames of the files to copy, and read keys of uploaded objects. This, of course, is handy if you have a readable stream of freshly generated artifacts or a diff of some kind as an input. The purpose of **pushup** is to copy file trees to S3 with optional [gzip](http://www.gzip.org/) compression and `Cache-Control` headers, configurable for file types or specific filenames.
 
 [![Build Status](https://secure.travis-ci.org/michaelnisi/pushup.svg)](http://travis-ci.org/michaelnisi/pushup)
 
@@ -74,24 +74,28 @@ push.write('/some/other/file')
 push.end()
 ```
 
-This would copy the files to `/file` and `/other/file` in your S3 bucket. If `root` is `undefined` or your defined `root` is not part of the given file path, the entire path will be replicated.
+This would copy the files to `'/file'` and `'/other/file'` in your S3 bucket, using `'some'` as root. If `root` is `undefined` or not a node of the given file path, the entire tree’d be replicated.
 
 ### opts()
 
-A configuration `Object` passed to the `Transform` stream constructor.
+Optional parameters you might want to use.
 
-- `region` `String()` The AWS region—defaults to `process.env.AWS_REGION`.
 - `gzip` [gzip()](#gzip)
 - `root` [root()](#root)
 - `tmp` `String()` defaults to `'/tmp/pushup'`
 - `ttl` [ttl()](#ttl)
+- `encoding` `String()` Passed to `stream.Readable()`. Defaults to `'utf8'`.
+- `highWaterMark` `Number()` Passed directly to `stream.Readable()`.
 
 ## Exports
 
-### pushup(bucket, opts)
+### pushup(region, bucket, key, secret, opts)
 
+- `region` `String()` The region to send service requests to.
 - `bucket` `String()` The name of the bucket.
-- `opts` [opts()](#opts) | undefined | null Some optional settings.
+- `key` `String()` Your AWS access key ID.
+- `secret` `String()` Your AWS secret access key.
+- `opts` [opts()](#opts) | `undefined` | `null` Some optional settings.
 
 A Transform stream that consumes filenames and emits paths of files copied to a S3.
 

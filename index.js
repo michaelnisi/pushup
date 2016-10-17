@@ -17,42 +17,68 @@ const stream = require('readable-stream')
 const util = require('util')
 const zlib = require('zlib')
 
-// TODO: Rename to something more expressive
-function Opts (data) {
-  if (!(this instanceof Opts)) return new Opts(data)
+function MetaData (data) {
+  if (!(this instanceof MetaData)) return new MetaData(data)
   util._extend(this, data)
 }
 
-Opts.prototype.value = function (fd) {
+MetaData.prototype.value = function (fd) {
   return this[path.basename(fd)] || this[path.extname(fd)]
 }
 
-function defaults (opts) {
-  const o = Object.create(null)
-  o.gzip = opts.gzip || Object.create(null)
-  o.region = opts.region || undefined
-  o.root = opts.root || undefined
-  o.tmp = opts.tmp || os.tmpdir()
-  o.ttl = opts.ttl || Object.create(null)
-  return o
+function Opts (gzip, root, tmp, ttl, encoding, highWaterMark) {
+  this.gzip = gzip || Object.create(null)
+  this.root = root
+  this.tmp = tmp || os.tmpdir()
+  this.ttl = ttl || Object.create(null)
+
+  this.encoding = encoding || 'utf8'
+  this.highWaterMark = highWaterMark
 }
 
-function Pushup (bucket, opts) {
-  if (!(this instanceof Pushup)) return new Pushup(bucket, opts)
-  assert(typeof bucket === 'string', 'bucket not set')
-  opts = defaults(opts)
-  stream.Transform.call(this, opts)
+Opts.defaults = function (opts) {
+  opts = opts || Object.create(null)
+  return new Opts(
+    opts.gzip,
+    opts.root,
+    opts.tmp,
+    opts.ttl,
+    opts.encoding,
+    opts.highWaterMark
+  )
+}
+
+function Pushup (region, bucket, key, secret, opts) {
+  if (!(this instanceof Pushup)) {
+    return new Pushup(region, bucket, key, secret, opts)
+  }
+
+  assert(typeof region === 'string')
+  assert(typeof bucket === 'string')
+  assert(typeof key === 'string')
+  assert(typeof secret === 'string')
+
+  opts = Opts.defaults(opts)
+
+  stream.Transform.call(this, {
+    encoding: opts.encoding,
+    highWaterMark: opts.highWaterMark
+  })
+
+  this.decoder = new StringDecoder(opts.encoding)
 
   this.bucket = bucket
   this.root = opts.root
   this.tmp = opts.tmp
+  this.ttl = new MetaData(opts.ttl)
+  this.gzip = new MetaData(opts.gzip)
 
-  this.ttl = new Opts(opts.ttl)
-  this.gzip = new Opts(opts.gzip)
-
-  this.decoder = new StringDecoder()
-
-  AWS.config.region = opts.region
+  const conf = new AWS.Config({
+    accessKeyId: key,
+    secretAccessKey: secret,
+    region: opts.region
+  })
+  this.client = new AWS.S3(conf)
 }
 util.inherits(Pushup, stream.Transform)
 
@@ -128,18 +154,34 @@ function remote (root, file) {
   return !!root && !!file ? path.normalize(file.split(root)[1]) : file
 }
 
-Pushup.prototype.client = function () {
-  if (!this._client) this._client = new AWS.S3()
-  return this._client
-}
-
 function local (root, file) {
   return path.join(root || '', file)
 }
 
+// A subset of AWS putObject parameters, which in fact uses uppercase property
+// names.
+function PutParams (
+  bucket,
+  key,
+  body,
+  cacheControl,
+  contentEncoding,
+  contentType,
+  expires
+) {
+  this.Bucket = bucket
+  this.Key = key
+  this.Body = body
+  // These are optional:
+  this.CacheControl = cacheControl
+  this.ContentEncoding = contentEncoding
+  this.ContentType = contentType
+  this.Expires = expires
+}
+
 Pushup.prototype._transform = function (chunk, enc, cb) {
   const bucket = this.bucket
-  const client = this.client()
+  const client = this.client
 
   const unzipped = local(this.root, this.decoder.write(chunk))
   const key = remote(this.root, unzipped)
@@ -147,13 +189,13 @@ Pushup.prototype._transform = function (chunk, enc, cb) {
   const me = this
 
   function upload (file, headers) {
-    const params = {
-      Bucket: bucket,
-      Key: key,
-      Body: fs.createReadStream(file)
-    }
+    const body = fs.createReadStream(file)
+
+    // TODO: Pass all parameters
+    const params = new PutParams(bucket, key, body)
+
     client.putObject(params, (er, data) => {
-      if (er instanceof Error) return cb(er)
+      if (er) return cb(er)
       me.push(key)
       cb()
     })
@@ -191,8 +233,9 @@ Pushup.prototype._flush = function (cb) {
 
 if (process.env.NODE_TEST) {
   module.exports.Headers = Headers
+  module.exports.MetaData = MetaData
   module.exports.Opts = Opts
-  module.exports.defaults = defaults
+  module.exports.defaults = Opts.defaults
   module.exports.enc = enc
   module.exports.gz = gz
   module.exports.headers = headers
