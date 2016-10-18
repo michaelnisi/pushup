@@ -1,6 +1,6 @@
 # pushup - copy files to S3
 
-The **pushup** [Node.js](http://nodejs.org/) package copies local files to [S3](http://aws.amazon.com/s3/). Its API is a sole Transform stream, which lets you write filenames of the files to copy, and read keys of uploaded objects. This, of course, is handy if you have a readable stream of freshly generated artifacts or a diff of some kind as an input. The purpose of **pushup** is to copy file trees to S3 with optional [gzip](http://www.gzip.org/) compression and `Cache-Control` headers, configurable for file types or specific filenames.
+The **pushup** [Node.js](http://nodejs.org/) package copies local files to a [S3](http://aws.amazon.com/s3/) bucket. Its API is a sole [Transform stream](https://nodejs.org/api/stream.html#stream_class_stream_transform), which lets you write filenames of local files to copy, and read keys of objects, successfully copied to the bucket. This streaming API is handy, of course, if you have a readable stream of freshly generated artifacts or a diff of some kind as input, enabling you to pipe directly to your S3 bucket. The intial purpose of **pushup** is to deploy file trees to S3, including optional [gzip](http://www.gzip.org/) compression and `Cache-Control` headers, configurable for file types or specific filenames.
 
 [![Build Status](https://secure.travis-ci.org/michaelnisi/pushup.svg)](http://travis-ci.org/michaelnisi/pushup)
 
@@ -9,9 +9,9 @@ The **pushup** [Node.js](http://nodejs.org/) package copies local files to [S3](
 **pushup** is a [Transform](http://nodejs.org/api/stream.html#stream_class_stream_transform) stream to which you write filenames of files you want to copy to S3. If you export your S3 credentials to your process environment, you can neglect the options object.
 
 ```js
-var pushup = require('pushup')
+const pushup = require('pushup')
 
-var p = pushup('my.aws.bucket')
+let p = pushup('my.aws.bucket')
 p.write('/some/file')
 p.end('/some/other/file')
 ```
@@ -80,6 +80,7 @@ This would copy the files to `'/file'` and `'/other/file'` in your S3 bucket, us
 
 Some optional parameters you might want to use.
 
+- `endpoint` `String()` Alternative endpoint URL.
 - `gzip` [gzip()](#gzip) | `undefined` | `null`
 - `root` [root()](#root) | `undefined` | `null`
 - `tmp` `String()` Directory to store temporary files. Defaults to `'os.tmpdir()/pushup'`.

@@ -26,7 +26,8 @@ MetaData.prototype.value = function (fd) {
   return this[path.basename(fd)] || this[path.extname(fd)]
 }
 
-function Opts (gzip, root, tmp, ttl, encoding, highWaterMark) {
+function Opts (endpoint, gzip, root, tmp, ttl, encoding, highWaterMark) {
+  this.endpoint = endpoint
   this.gzip = gzip || Object.create(null)
   this.root = root
   this.tmp = tmp || os.tmpdir()
@@ -39,6 +40,7 @@ function Opts (gzip, root, tmp, ttl, encoding, highWaterMark) {
 Opts.defaults = function (opts) {
   opts = opts || Object.create(null)
   return new Opts(
+    opts.endpoint,
     opts.gzip,
     opts.root,
     opts.tmp,
@@ -53,10 +55,9 @@ function Pushup (region, bucket, key, secret, opts) {
     return new Pushup(region, bucket, key, secret, opts)
   }
 
-  assert(typeof region === 'string')
-  assert(typeof bucket === 'string')
-  assert(typeof key === 'string')
-  assert(typeof secret === 'string')
+  ;[region, bucket, key, secret].forEach((p) => {
+    assert(typeof p === 'string', 'should be string')
+  })
 
   opts = Opts.defaults(opts)
 
@@ -235,7 +236,6 @@ if (process.env.NODE_TEST) {
   module.exports.Headers = Headers
   module.exports.MetaData = MetaData
   module.exports.Opts = Opts
-  module.exports.defaults = Opts.defaults
   module.exports.enc = enc
   module.exports.gz = gz
   module.exports.headers = headers

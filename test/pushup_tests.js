@@ -37,17 +37,17 @@ test('init', (t) => {
 test('ENOENT', (t) => {
   t.plan(2)
   var f = pushup
-  f('abc', { key: 'a', secret: 'b' })
-    .on('error', function (er) {
+  f('europe', 'abc', 'a', 'b')
+    .on('error', (er) => {
       t.ok(er instanceof Error)
       t.is(er.code, 'ENOENT')
     })
     .write('abc')
 })
 
-test('remote', function (t) {
+test('remote', (t) => {
   var f = pushup.remote
-  t.throws(function () { f('/tmp/pushup', '/path/to/a/thing.js') })
+  t.throws(() => { f('/tmp/pushup', '/path/to/a/thing.js') })
   var wanted = [
     undefined,
     undefined,
@@ -59,13 +59,13 @@ test('remote', function (t) {
     f('/tmp/pushup'),
     f('/tmp/pushup', '/tmp/pushup/thing.js'),
     f('/tmp/pushup', '/tmp/pushup/path/to/a/thing.js')
-  ].forEach(function (found, i) {
+  ].forEach((found, i) => {
     t.deepEqual(found, wanted[i])
   })
   t.end()
 })
 
-test('gz', function (t) {
+test('gz', (t) => {
   t.plan(3)
   var f = pushup.gz
   t.throws(f)
@@ -76,14 +76,14 @@ test('gz', function (t) {
   ;[
     f('/tmp/pushup', __filename),
     f('/tmp/pushup', 'path/to/a/thing.tm')
-  ].forEach(function (found, i) {
+  ].forEach((found, i) => {
     t.deepEqual(found, wanted[i])
   })
   t.end()
   // TODO: We have to retain paths for S3
 })
 
-test('MetaData', function (t) {
+test('MetaData', (t) => {
   var f = pushup.MetaData
   t.plan(3)
   t.is(f().value('index.html'), undefined)
@@ -98,12 +98,12 @@ function write (name, data) {
   return fd
 }
 
-test('headers', function (t) {
+test('headers', (t) => {
   t.plan(2)
   var f = pushup.headers
   var unzipped = write('hello.js', 'console.log("hello\n")')
   var zipped
-  f(unzipped, zipped, 3600, function (er, headers) {
+  f(unzipped, zipped, 3600, (er, headers) => {
     t.ok(!er)
     var wanted = {
       'Content-Length': 20,
@@ -115,12 +115,12 @@ test('headers', function (t) {
   })
 })
 
-test('enc', function (t) {
+test('enc', (t) => {
   var f = pushup.enc
 
   var v = process.versions.node
   if (semver.satisfies(v, '>=6')) {
-    t.throws(function () { f() })
+    t.throws(() => { f() })
   }
 
   var wanted = [
@@ -134,14 +134,14 @@ test('enc', function (t) {
     f('some.js'),
     f('/a/thing.css'),
     f('/a/thing.css.gz')
-  ].forEach(function (found, i) {
+  ].forEach((found, i) => {
     t.deepEqual(found, wanted[i])
   })
 
   t.end()
 })
 
-test('type', function (t) {
+test('type', (t) => {
   var f = pushup.type
   t.plan(2)
   t.throws(f)
@@ -149,7 +149,7 @@ test('type', function (t) {
   t.end()
 })
 
-test('Headers', function (t) {
+test('Headers', (t) => {
   t.plan(5)
   var f = pushup.Headers
   var wanted = [
@@ -165,13 +165,13 @@ test('Headers', function (t) {
     f(null, 'text/css'),
     f(null, undefined, 3600),
     f(null, undefined, 0, 'gzip')
-  ].forEach(function (found, i) {
+  ].forEach((found, i) => {
     t.deepEqual(found, wanted[i])
   })
   t.end()
 })
 
-test('zippable', function (t) {
+test('zippable', (t) => {
   t.plan(8)
   var f = pushup.zippable
   var wanted = [
@@ -193,14 +193,14 @@ test('zippable', function (t) {
     f('such.txt'),
     f('such.xml'),
     f('such.jpg')
-  ].forEach(function (found, i) {
+  ].forEach((found, i) => {
     t.deepEqual(found, wanted[i])
   })
   t.end()
 })
 
 test('defaults', (t) => {
-  var f = pushup.defaults
+  var f = pushup.Opts.defaults
 
   t.plan(5)
   t.ok(f())
@@ -212,38 +212,12 @@ test('defaults', (t) => {
   t.end()
 })
 
-test('conf', function (t) {
-  t.plan(4)
-  var f = pushup.defaults
-  t.throws(f)
-  var env = {
-    AWS_ACCESS_KEY_ID: 'a',
-    AWS_SECRET_ACCESS_KEY: 'b',
-    S3_BUCKET: 'c',
-    S3_REGION: 'd',
-    S3_ENDPOINT: 'e'
-  }
-  function opts (key, secret, bucket, region, endpoint) {
-    return {
-      key: key,
-      secret: secret,
-      bucket: bucket,
-      region: region,
-      endpoint: endpoint
-    }
-  }
-  t.deepEqual(f({}, env), opts('a', 'b', 'c', 'd', 'e'))
-  t.deepEqual(f(opts('a', 'b', 'c', 'd')), opts('a', 'b', 'c', 'd'))
-  t.deepEqual(f({key: 'aa', secret: 'bb'}, env), opts('aa', 'bb', 'c', 'd', 'e'))
-  t.end()
-})
-
 var rimraf = require('rimraf').sync
 
-test('teardown', function (t) {
+test('teardown', (t) => {
   t.plan(1)
   rimraf(dir)
-  fs.stat(dir, function (er) {
+  fs.stat(dir, (er) => {
     t.ok(!!er, 'should clean up after ourselves')
     t.end()
   })
